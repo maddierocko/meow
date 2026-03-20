@@ -1,0 +1,2065 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>You Are the Cat</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323:wght@400&display=swap');
+
+:root {
+  --bg: #0d0d0f;
+  --bg2: #13131a;
+  --bg3: #1a1a24;
+  --border: #2a2a3a;
+  --accent: #b48eff;
+  --accent2: #ff6b6b;
+  --accent3: #6bffb8;
+  --text: #e8e8f0;
+  --text-dim: #7070a0;
+  --chaos: #ff4444;
+  --suspicion: #ffaa00;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'VT323', monospace;
+  font-size: 20px;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow-x: hidden;
+}
+
+body::before {
+  content:'';
+  position:fixed;
+  inset:0;
+  background: repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.07) 2px,rgba(0,0,0,0.07) 4px);
+  pointer-events:none;
+  z-index:200;
+}
+
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+@keyframes glitch{0%,88%,100%{transform:translate(0);filter:none}90%{transform:translate(-2px,1px);filter:hue-rotate(80deg)}93%{transform:translate(2px,-1px);filter:hue-rotate(-80deg)}96%{transform:translate(0)}}
+@keyframes tailwag-l{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(8deg)}}
+@keyframes tailwag-r{0%,100%{transform:rotate(7deg)}50%{transform:rotate(-9deg)}}
+@keyframes float-l{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@keyframes float-r{0%,100%{transform:translateY(-2px)}50%{transform:translateY(3px)}}
+@keyframes float-cat{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideIn{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:translateX(0)}}
+@keyframes pulse-chaos{0%,100%{box-shadow:0 0 0 rgba(255,68,68,0)}50%{box-shadow:0 0 16px rgba(255,68,68,0.3)}}
+@keyframes screen-shake{0%,100%{transform:translate(0)}20%{transform:translate(-3px,1px)}40%{transform:translate(3px,-1px)}60%{transform:translate(-1px,2px)}80%{transform:translate(2px,-2px)}}
+@keyframes void-pulse{0%,100%{filter:drop-shadow(0 0 6px #ff2a2a)}50%{filter:drop-shadow(0 0 16px #ff2a2a) drop-shadow(0 0 32px #ff000066)}}
+
+.screen { display:none; width:100%; min-height:100vh; padding:20px; animation:fadeIn 0.3s ease; }
+.screen.active { display:flex; flex-direction:column; align-items:center; justify-content:center; }
+
+.wrap { width:100%; max-width:680px; }
+
+/* ---- TITLE SCREEN ---- */
+#title-screen { background: var(--bg); }
+
+.title-art {
+  text-align:center;
+  margin-bottom:32px;
+}
+
+.title-main {
+  font-family:'Press Start 2P', monospace;
+  font-size:14px;
+  color:var(--accent);
+  text-shadow:0 0 24px rgba(180,142,255,0.6), 4px 4px 0 rgba(180,142,255,0.15);
+  letter-spacing:3px;
+  line-height:1.8;
+  animation:glitch 9s infinite;
+  display:block;
+}
+
+.title-sub {
+  font-size:20px;
+  color:var(--text-dim);
+  letter-spacing:4px;
+  margin-top:6px;
+  display:block;
+}
+
+.title-cat {
+  margin:30px auto;
+  display:flex;
+  justify-content:center;
+}
+
+.title-cat svg { animation:float-cat 3s ease-in-out infinite; }
+
+.menu-btns {
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  margin-top:8px;
+}
+
+.menu-btn {
+  background:var(--bg2);
+  border:2px solid var(--border);
+  color:var(--text);
+  font-family:'VT323', monospace;
+  font-size:22px;
+  padding:14px 20px;
+  cursor:pointer;
+  text-align:left;
+  display:flex;
+  align-items:center;
+  gap:12px;
+  transition:all 0.1s;
+  letter-spacing:1px;
+}
+
+.menu-btn:hover { background:var(--bg3); border-color:var(--accent); color:var(--accent); }
+.menu-btn .arrow { font-family:'Press Start 2P',monospace; font-size:8px; color:var(--text-dim); }
+.menu-btn:hover .arrow { color:var(--accent); }
+
+/* ---- CAT SELECT ---- */
+#cat-select { background:var(--bg); }
+
+.screen-title {
+  font-family:'Press Start 2P',monospace;
+  font-size:10px;
+  color:var(--accent);
+  letter-spacing:2px;
+  text-align:center;
+  margin-bottom:6px;
+  text-shadow:0 0 16px rgba(180,142,255,0.4);
+}
+
+.screen-sub {
+  font-size:17px;
+  color:var(--text-dim);
+  text-align:center;
+  letter-spacing:2px;
+  margin-bottom:28px;
+}
+
+.cats-grid {
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:10px;
+  margin-bottom:20px;
+}
+
+.cat-tile {
+  background:var(--bg2);
+  border:2px solid var(--border);
+  padding:14px 8px 12px;
+  cursor:pointer;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:8px;
+  transition:all 0.1s;
+  position:relative;
+}
+
+.cat-tile:hover:not(.locked) { border-color:var(--accent); background:var(--bg3); }
+.cat-tile.selected { border-color:var(--accent); background:#1a1428; }
+.cat-tile.locked { opacity:0.4; cursor:default; }
+
+.cat-tile-name {
+  font-family:'Press Start 2P',monospace;
+  font-size:5px;
+  color:var(--text);
+  text-align:center;
+  line-height:1.8;
+  letter-spacing:0.5px;
+}
+
+.cat-tile-hint {
+  font-size:12px;
+  color:var(--text-dim);
+  text-align:center;
+  line-height:1.3;
+}
+
+.lock-icon {
+  position:absolute;
+  top:5px;
+  right:5px;
+  font-family:'Press Start 2P',monospace;
+  font-size:5px;
+  color:var(--text-dim);
+  background:var(--bg3);
+  border:1px solid var(--border);
+  padding:2px 4px;
+}
+
+.active-icon {
+  position:absolute;
+  top:5px;
+  left:5px;
+  font-family:'Press Start 2P',monospace;
+  font-size:5px;
+  color:var(--accent);
+  background:rgba(180,142,255,0.15);
+  border:1px solid var(--accent);
+  padding:2px 4px;
+  animation:blink 2s infinite;
+}
+
+.select-confirm {
+  display:flex;
+  gap:10px;
+}
+
+.btn-primary {
+  flex:1;
+  background:var(--accent);
+  border:2px solid var(--accent);
+  color:#0d0d0f;
+  font-family:'VT323',monospace;
+  font-size:20px;
+  padding:12px 20px;
+  cursor:pointer;
+  font-weight:bold;
+  letter-spacing:1px;
+  transition:all 0.1s;
+}
+
+.btn-primary:hover { background:#c8a8ff; border-color:#c8a8ff; }
+
+.btn-secondary {
+  background:var(--bg2);
+  border:2px solid var(--border);
+  color:var(--text-dim);
+  font-family:'VT323',monospace;
+  font-size:20px;
+  padding:12px 20px;
+  cursor:pointer;
+  letter-spacing:1px;
+  transition:all 0.1s;
+}
+
+.btn-secondary:hover { border-color:var(--text-dim); color:var(--text); }
+
+/* ---- GAME SCREEN ---- */
+#game-screen { background:var(--bg); align-items:flex-start; padding-top:0; }
+
+.game-wrap { width:100%; max-width:680px; padding:20px; }
+
+.chapter-bar {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:16px;
+  padding-bottom:12px;
+  border-bottom:2px solid var(--border);
+}
+
+.chapter-name {
+  font-family:'Press Start 2P',monospace;
+  font-size:7px;
+  color:var(--accent3);
+  letter-spacing:1px;
+}
+
+.chapter-progress {
+  font-family:'Press Start 2P',monospace;
+  font-size:6px;
+  color:var(--text-dim);
+}
+
+.meters {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-bottom:16px;
+}
+
+.meter {
+  background:var(--bg2);
+  padding:8px 12px;
+  border:2px solid var(--border);
+}
+
+.meter-label {
+  font-family:'Press Start 2P',monospace;
+  font-size:6px;
+  letter-spacing:1px;
+  margin-bottom:6px;
+  display:flex;
+  justify-content:space-between;
+}
+
+.meter-label.chaos { color:var(--chaos); }
+.meter-label.susp { color:var(--suspicion); }
+
+.meter-bar-bg {
+  height:8px;
+  background:var(--bg3);
+  border:1px solid var(--border);
+  overflow:hidden;
+}
+
+.meter-fill {
+  height:100%;
+  transition:width 0.4s ease;
+}
+
+.chaos-fill {
+  background:repeating-linear-gradient(90deg,var(--chaos) 0,var(--chaos) 6px,#cc2222 6px,#cc2222 8px);
+  box-shadow:0 0 6px rgba(255,68,68,0.4);
+}
+
+.susp-fill {
+  background:repeating-linear-gradient(90deg,var(--suspicion) 0,var(--suspicion) 6px,#cc8800 6px,#cc8800 8px);
+  box-shadow:0 0 6px rgba(255,170,0,0.4);
+}
+
+.scene-panel {
+  background:var(--bg2);
+  border:2px solid var(--border);
+  margin-bottom:16px;
+  overflow:hidden;
+  animation:fadeIn 0.3s ease;
+}
+
+.scene-visual {
+  height:170px;
+  background:var(--bg3);
+  border-bottom:2px solid var(--border);
+  position:relative;
+  overflow:hidden;
+}
+
+.scene-visual::after {
+  content:'';
+  position:absolute;
+  bottom:0;left:0;right:0;
+  height:24px;
+  background:repeating-linear-gradient(90deg,#1c1c28 0,#1c1c28 20px,#202030 20px,#202030 40px);
+  border-top:2px solid #2a2a3a;
+}
+
+.scene-svg { position:absolute; bottom:24px; left:0; right:0; width:100%; height:calc(100% - 24px); }
+
+.time-badge, .chapter-badge {
+  position:absolute;
+  font-family:'Press Start 2P',monospace;
+  font-size:6px;
+  background:var(--bg);
+  border:1px solid var(--border);
+  padding:3px 7px;
+  z-index:10;
+  top:8px;
+}
+
+.time-badge { left:8px; color:var(--accent3); }
+.chapter-badge { right:8px; color:var(--text-dim); }
+
+.narration {
+  padding:18px 20px;
+}
+
+.narration-text {
+  font-size:21px;
+  line-height:1.6;
+  color:var(--text);
+  animation:slideIn 0.25s ease;
+}
+
+.narration-text .hl { color:var(--accent); }
+.narration-text .danger { color:var(--accent2); }
+.narration-text .good { color:var(--accent3); }
+
+.cursor {
+  display:inline-block;
+  width:10px;height:18px;
+  background:var(--text);
+  vertical-align:middle;
+  margin-left:3px;
+  animation:blink 1s infinite;
+}
+
+.choices {
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  margin-bottom:16px;
+}
+
+.choice-btn {
+  background:var(--bg2);
+  border:2px solid var(--border);
+  color:var(--text);
+  font-family:'VT323',monospace;
+  font-size:20px;
+  padding:12px 16px;
+  text-align:left;
+  cursor:pointer;
+  display:flex;
+  align-items:flex-start;
+  gap:10px;
+  transition:all 0.1s;
+  animation:fadeIn 0.3s ease;
+  letter-spacing:0.5px;
+}
+
+.choice-btn:hover { background:var(--bg3); border-color:var(--accent); color:var(--accent); }
+.choice-btn.chaos-choice:hover { border-color:var(--accent2); color:var(--accent2); }
+.choice-btn.void-choice:hover { border-color:#ff2a2a; color:#ff2a2a; }
+
+.choice-arrow { font-family:'Press Start 2P',monospace; font-size:7px; color:var(--text-dim); margin-top:4px; flex-shrink:0; }
+.choice-btn:hover .choice-arrow { color:inherit; }
+.choice-text { flex:1; }
+
+.choice-tag {
+  font-family:'Press Start 2P',monospace;
+  font-size:5px;
+  padding:3px 5px;
+  border:1px solid;
+  align-self:center;
+  flex-shrink:0;
+}
+
+.tag-neutral { color:var(--text-dim); border-color:var(--border); }
+.tag-chaos { color:var(--chaos); border-color:var(--chaos); background:rgba(255,68,68,0.08); }
+.tag-void { color:#ff2a2a; border-color:#ff2a2a; background:rgba(255,42,42,0.1); animation:blink 1.5s infinite; }
+.tag-calm { color:var(--accent3); border-color:var(--accent3); background:rgba(107,255,184,0.08); }
+
+.game-footer {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding-top:10px;
+  border-top:2px solid var(--border);
+}
+
+.footer-txt { font-family:'Press Start 2P',monospace; font-size:6px; color:var(--text-dim); }
+
+.progress-dots { display:flex; gap:5px; align-items:center; }
+.pdot { width:7px; height:7px; background:var(--border); border:1px solid var(--text-dim); }
+.pdot.done { background:var(--accent); box-shadow:0 0 5px var(--accent); }
+.pdot.cur { background:var(--accent2); box-shadow:0 0 5px var(--accent2); animation:blink 1s infinite; }
+
+/* ---- ENDING SCREEN ---- */
+#ending-screen { background:var(--bg); }
+
+.ending-wrap {
+  width:100%;
+  max-width:600px;
+  text-align:center;
+}
+
+.ending-chapter {
+  font-family:'Press Start 2P',monospace;
+  font-size:7px;
+  color:var(--text-dim);
+  letter-spacing:2px;
+  margin-bottom:12px;
+}
+
+.ending-title {
+  font-family:'Press Start 2P',monospace;
+  font-size:18px;
+  line-height:1.8;
+  margin-bottom:20px;
+  animation:glitch 6s infinite;
+}
+
+.ending-cat { margin:20px auto; display:flex; justify-content:center; }
+
+.ending-meters {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin:20px 0;
+  text-align:left;
+}
+
+.ending-text {
+  font-size:22px;
+  color:var(--text-dim);
+  line-height:1.7;
+  margin-bottom:28px;
+  padding:0 10px;
+}
+
+.ending-secret {
+  background:#120020;
+  border:2px solid #440044;
+  padding:16px;
+  margin-bottom:20px;
+  font-family:'Press Start 2P',monospace;
+  font-size:7px;
+  color:#cc44ff;
+  line-height:2;
+  animation:blink 3s infinite;
+}
+
+.ending-btns { display:flex; flex-direction:column; gap:10px; }
+
+/* ---- RUN HISTORY ---- */
+#history-screen { background:var(--bg); }
+
+.history-list {
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  margin-bottom:20px;
+  max-height:60vh;
+  overflow-y:auto;
+}
+
+.history-item {
+  background:var(--bg2);
+  border:2px solid var(--border);
+  padding:14px 16px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:12px;
+}
+
+.history-ending { font-family:'Press Start 2P',monospace; font-size:7px; color:var(--accent); line-height:1.8; }
+.history-cat { font-size:16px; color:var(--text-dim); }
+.history-date { font-family:'Press Start 2P',monospace; font-size:5px; color:var(--text-dim); text-align:right; line-height:2; }
+
+/* tail animations in game */
+.gtail-l { transform-origin:4px 0; animation:tailwag-l 1.4s ease-in-out infinite; }
+.gtail-r { transform-origin:4px 0; animation:tailwag-r 1.6s ease-in-out infinite 0.3s; }
+.gfloat-l { animation:float-l 2.8s ease-in-out infinite; }
+.gfloat-r { animation:float-r 3.1s ease-in-out infinite 0.5s; }
+.gfloat { animation:float-cat 3s ease-in-out infinite; }
+.void-cat-anim { animation:float-cat 3s ease-in-out infinite, void-pulse 2.5s ease-in-out infinite; }
+
+</style>
+</head>
+<body>
+
+<!-- ============================================================ -->
+<!-- TITLE SCREEN                                                  -->
+<!-- ============================================================ -->
+<div id="title-screen" class="screen active">
+  <div class="wrap">
+    <div class="title-art">
+      <span class="title-main">YOU ARE THE CAT</span>
+      <span class="title-sub">A GAME OF CONSEQUENCE</span>
+    </div>
+
+    <div class="title-cat" id="title-cat-display">
+      <!-- rendered by JS -->
+    </div>
+
+    <div class="menu-btns">
+      <button class="menu-btn" onclick="showScreen('cat-select')">
+        <span class="arrow">▶</span> NEW GAME
+      </button>
+      <button class="menu-btn" id="continue-btn" onclick="continueGame()" style="display:none">
+        <span class="arrow">▶</span> CONTINUE
+      </button>
+      <button class="menu-btn" onclick="showScreen('history-screen')">
+        <span class="arrow">▶</span> RUN HISTORY
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- CAT SELECT                                                    -->
+<!-- ============================================================ -->
+<div id="cat-select" class="screen">
+  <div class="wrap">
+    <div class="screen-title">CHOOSE YOUR CAT</div>
+    <div class="screen-sub">EACH CAT. DIFFERENT NARRATION. SAME CHAOS.</div>
+
+    <div class="cats-grid" id="cats-grid">
+      <!-- rendered by JS -->
+    </div>
+
+    <div class="select-confirm">
+      <button class="btn-primary" onclick="startGame()">BEGIN</button>
+      <button class="btn-secondary" onclick="showScreen('title-screen')">BACK</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- GAME SCREEN                                                   -->
+<!-- ============================================================ -->
+<div id="game-screen" class="screen">
+  <div class="game-wrap">
+    <div class="chapter-bar">
+      <div class="chapter-name" id="chapter-name">CHAPTER 1: KITCHEN</div>
+      <div class="chapter-progress" id="chapter-progress">DECISION 1 OF 7</div>
+    </div>
+
+    <div class="meters">
+      <div class="meter">
+        <div class="meter-label chaos">
+          <span>CHAOS</span><span id="chaos-val">0%</span>
+        </div>
+        <div class="meter-bar-bg"><div class="meter-fill chaos-fill" id="chaos-bar" style="width:0%"></div></div>
+      </div>
+      <div class="meter">
+        <div class="meter-label susp">
+          <span>SUSPICION</span><span id="susp-val">0%</span>
+        </div>
+        <div class="meter-bar-bg"><div class="meter-fill susp-fill" id="susp-bar" style="width:0%"></div></div>
+      </div>
+    </div>
+
+    <div class="scene-panel">
+      <div class="scene-visual">
+        <div class="time-badge" id="time-badge">8:12 AM</div>
+        <div class="chapter-badge" id="chapter-badge">CH.1</div>
+        <svg class="scene-svg" id="scene-svg" viewBox="0 0 680 146" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+          <!-- rendered by JS -->
+        </svg>
+      </div>
+      <div class="narration">
+        <div class="narration-text" id="narration-text"></div>
+      </div>
+    </div>
+
+    <div class="choices" id="choices"></div>
+
+    <div class="game-footer">
+      <div class="footer-txt" id="footer-left">DECISION 1</div>
+      <div class="progress-dots" id="progress-dots"></div>
+      <div class="footer-txt">YOU ARE THE CAT</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- ENDING SCREEN                                                 -->
+<!-- ============================================================ -->
+<div id="ending-screen" class="screen">
+  <div class="ending-wrap">
+    <div class="ending-chapter" id="ending-chapter">RUN COMPLETE</div>
+    <div class="ending-title" id="ending-title"></div>
+
+    <div class="ending-cat" id="ending-cat-display"></div>
+
+    <div class="ending-meters">
+      <div class="meter">
+        <div class="meter-label chaos"><span>FINAL CHAOS</span><span id="end-chaos-val">0%</span></div>
+        <div class="meter-bar-bg"><div class="meter-fill chaos-fill" id="end-chaos-bar" style="width:0%"></div></div>
+      </div>
+      <div class="meter">
+        <div class="meter-label susp"><span>FINAL SUSPICION</span><span id="end-susp-val">0%</span></div>
+        <div class="meter-bar-bg"><div class="meter-fill susp-fill" id="end-susp-bar" style="width:0%"></div></div>
+      </div>
+    </div>
+
+    <div class="ending-text" id="ending-text"></div>
+    <div class="ending-secret" id="ending-secret" style="display:none"></div>
+
+    <div class="ending-btns">
+      <button class="menu-btn" onclick="startNewRun()"><span class="arrow">▶</span> PLAY AGAIN</button>
+      <button class="menu-btn" onclick="showScreen('cat-select')"><span class="arrow">▶</span> CHANGE CAT</button>
+      <button class="menu-btn" onclick="showScreen('title-screen')"><span class="arrow">▶</span> MAIN MENU</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- HISTORY SCREEN                                                -->
+<!-- ============================================================ -->
+<div id="history-screen" class="screen">
+  <div class="wrap">
+    <div class="screen-title">RUN HISTORY</div>
+    <div class="screen-sub">YOUR LAST 10 DESCENTS INTO CHAOS</div>
+    <div class="history-list" id="history-list"></div>
+    <button class="btn-secondary" style="width:100%" onclick="showScreen('title-screen')">BACK</button>
+  </div>
+</div>
+
+<script>
+
+'use strict';
+
+// ============================================================
+// STATE
+// ============================================================
+let G = {
+  catId: 'gray_tabby',
+  chaos: 0,
+  suspicion: 0,
+  chapterIndex: 0,
+  decisionIndex: 0,
+  choiceHistory: [],
+  runChoicePool: []   // per-run randomised choice pools for replayability
+};
+
+let selectedCat = 'gray_tabby';
+
+// ============================================================
+// CAT DEFINITIONS
+// ============================================================
+const CATS = {
+  gray_tabby: {
+    id:'gray_tabby', name:'GRAY TABBY',
+    tagline:'Dry. Unbothered. Has been here before.',
+    unlockHint:'DEFAULT — ALWAYS UNLOCKED',
+    unlocked: true,
+    eyeColor:'#b48eff', eyeLight:'#d4b8ff',
+    bodyColor:'#a8a8c0', bodyDark:'#505068', bodyLight:'#c8c8dc',
+    pointColor:'#505068', earInner:'#d4829a',
+    hasStripes:true, isTuxedo:false, isSisters:false, isVoid:false
+  },
+  orange_tabby: {
+    id:'orange_tabby', name:'ORANGE TABBY',
+    tagline:'Loud. Certain. Wrong but committed.',
+    unlockHint:'FINISH ANY RUN',
+    unlocked: false,
+    eyeColor:'#40cc60', eyeLight:'#80ee90',
+    bodyColor:'#e8841a', bodyDark:'#a05010', bodyLight:'#f09840',
+    pointColor:'#c06010', earInner:'#d4829a',
+    hasStripes:true, isTuxedo:false, isSisters:false, isVoid:false
+  },
+  black_cat: {
+    id:'black_cat', name:'BLACK CAT',
+    tagline:'No remorse. Not even a little.',
+    unlockHint:'REACH MAX CHAOS ENDING',
+    unlocked: false,
+    eyeColor:'#ddcc00', eyeLight:'#ffee44',
+    bodyColor:'#222230', bodyDark:'#111118', bodyLight:'#2a2a40',
+    pointColor:'#111118', earInner:'#5a2030',
+    hasStripes:false, isTuxedo:false, isSisters:false, isVoid:false
+  },
+  tuxedo: {
+    id:'tuxedo', name:'TUXEDO',
+    tagline:'Formal about it. The chaos is intentional.',
+    unlockHint:'FINISH WITH SUSPICION UNDER 20',
+    unlocked: false,
+    eyeColor:'#40cc60', eyeLight:'#80ee90',
+    bodyColor:'#222230', bodyDark:'#111118', bodyLight:'#e8e8f0',
+    pointColor:'#111118', earInner:'#5a2030',
+    hasStripes:false, isTuxedo:true, isSisters:false, isVoid:false
+  },
+  tortoiseshell: {
+    id:'tortoiseshell', name:'TORTOISESHELL',
+    tagline:'Unpredictable. Even to herself.',
+    unlockHint:'COMPLETE ALL 4 CHAPTERS',
+    unlocked: false,
+    eyeColor:'#cc8820', eyeLight:'#ffaa30',
+    bodyColor:'#8b4513', bodyDark:'#5a2d0c', bodyLight:'#e8841a',
+    pointColor:'#5a2d0c', earInner:'#d4829a',
+    hasStripes:false, isTuxedo:false, isSisters:false, isVoid:false
+  },
+  calico: {
+    id:'calico', name:'CALICO',
+    tagline:'Finds secret doors. Tells no one.',
+    unlockHint:'FIND A SECRET ENDING',
+    unlocked: false,
+    eyeColor:'#2080cc', eyeLight:'#60b8ff',
+    bodyColor:'#e8e8f0', bodyDark:'#c0c0d0', bodyLight:'#f4f4f8',
+    pointColor:'#e8841a', earInner:'#d4829a',
+    hasStripes:false, isTuxedo:false, isSisters:false, isVoid:false
+  },
+  sisters: {
+    id:'sisters', name:'THE SISTERS',
+    tagline:'One of them did it. Neither is saying which.',
+    unlockHint:'COMPLETE CH.3 WITH SUSPICION UNDER 30',
+    unlocked: false,
+    eyeColor:'#2878cc', eyeLight:'#60b8ff',
+    bodyColor:'#e8dcc8', bodyDark:'#6b4020', bodyLight:'#f0e8d8',
+    pointColor:'#3a2010', earInner:'#5a2e18',
+    hasStripes:false, isTuxedo:false, isSisters:true, isVoid:false
+  },
+  void_cat: {
+    id:'void_cat', name:'VOID CAT',
+    tagline:'It has seen all the endings. It is not impressed.',
+    unlockHint:'FIND ALL 4 SECRET ENDINGS',
+    unlocked: false,
+    eyeColor:'#cc0000', eyeLight:'#ff4444',
+    bodyColor:'#111118', bodyDark:'#0a0008', bodyLight:'#1a0028',
+    pointColor:'#0a0008', earInner:'#660018',
+    hasStripes:false, isTuxedo:false, isSisters:false, isVoid:true
+  }
+};
+
+const CAT_ORDER = ['gray_tabby','orange_tabby','black_cat','tuxedo','tortoiseshell','calico','sisters','void_cat'];
+
+// ============================================================
+// CHOICE TAG RULES — enforced in code, not just data
+// tag:'calm'    => chaos <= 0, susp <= 0  (at least one negative)
+// tag:'neutral' => chaos = 0, susp = 0   (strictly zero)
+// tag:'chaos'   => chaos > 0 OR susp > 0
+// tag:'void'    => chaos > 0, secret ending trigger
+// makeChoice clamps to these rules before applying.
+// ============================================================
+function applyChoice(choice) {
+  let dc = choice.chaos;
+  let ds = choice.susp;
+  // Enforce tag contract
+  if (choice.tag === 'neutral') { dc = 0; ds = 0; }
+  if (choice.tag === 'calm') {
+    dc = Math.min(0, dc);
+    ds = Math.min(0, ds);
+    if (dc === 0 && ds === 0) { dc = -4; ds = -3; } // floor: always reduce something
+  }
+  G.chaos     = Math.max(0, Math.min(100, G.chaos     + dc));
+  G.suspicion = Math.max(0, Math.min(100, G.suspicion + ds));
+}
+
+// ============================================================
+// GAME DATA
+// Each decision has a 'pool' of 4-5 choices. Each run picks 3
+// randomly, giving replayability without changing the story.
+// ============================================================
+const CHAPTERS = [
+  {
+    name:'CHAPTER 1: KITCHEN', badge:'CH.1',
+    times:['8:12 AM','8:34 AM','8:51 AM','9:03 AM','9:22 AM','9:40 AM','9:58 AM'],
+    decisions:[
+      {
+        narration:'The human has left. You heard the door. You are now the <span class="hl">only authority</span> in this building. The kitchen counter is six feet away. You have been thinking about this.',
+        sceneKey:'kitchen_counter',
+        pool:[
+          {text:'Jump onto the counter. You have earned this.',                              chaos:12, susp:0,  tag:'chaos',   key:'counter_jump'},
+          {text:'Sit on the floor and stare at the counter. Strategy first.',               chaos:0,  susp:0,  tag:'neutral', key:'counter_stare'},
+          {text:'The counter can wait. The cabinet above it cannot.',                        chaos:20, susp:5,  tag:'chaos',   key:'cabinet'},
+          {text:'Walk past the counter without looking at it. Power move.',                 chaos:0,  susp:-5, tag:'calm',    key:'counter_ignore'},
+          {text:'Sniff the counter from below. Reconnaissance.',                            chaos:0,  susp:0,  tag:'neutral', key:'counter_sniff'}
+        ]
+      },
+      {
+        narration:'You found something on the counter. It is <span class="danger">wrapped in plastic</span>. It smells like it belongs to you now. The human left a note that says "do not touch." You cannot read.',
+        sceneKey:'kitchen_item',
+        pool:[
+          {text:'Investigate thoroughly. Leave no wrapper intact.',                         chaos:14, susp:8,  tag:'chaos',   key:'unwrap'},
+          {text:'Knock it onto the floor and walk away with dignity.',                       chaos:0,  susp:0,  tag:'neutral', key:'knock_floor'},
+          {text:'Sit on top of it. Yours by right of proximity.',                           chaos:0,  susp:-4, tag:'calm',    key:'sit_on_it'},
+          {text:'Sniff it for three minutes. Decide against. Walk away.',                   chaos:0,  susp:-6, tag:'calm',    key:'item_decline'},
+          {text:'Bat it twice and push it to the very edge. Leave it there.',               chaos:8,  susp:5,  tag:'chaos',   key:'item_edge'}
+        ]
+      },
+      {
+        narration:'The sink is dripping. It has been dripping for three days. You have <span class="hl">opinions about this</span>. The drip lands every four seconds. You have been counting.',
+        sceneKey:'kitchen_sink',
+        pool:[
+          {text:'Drink from the drip. This is the correct way to drink water.',             chaos:0,  susp:-5, tag:'calm',    key:'drip_drink'},
+          {text:'Attempt to catch the drip with one paw. For forty minutes.',               chaos:0,  susp:0,  tag:'neutral', key:'drip_catch'},
+          {text:'Turn the handle further. See what happens.',                               chaos:22, susp:14, tag:'chaos',   key:'drip_flood'},
+          {text:'Sit in the sink. You live here now.',                                      chaos:8,  susp:4,  tag:'chaos',   key:'sink_sit'},
+          {text:'Watch the drip until you fall asleep. Peaceful.',                          chaos:0,  susp:-8, tag:'calm',    key:'drip_sleep'}
+        ]
+      },
+      {
+        narration:'There is a bird outside the kitchen window. It is <span class="danger">very confident</span> for a creature on the other side of glass. It has been sitting there for eleven minutes.',
+        sceneKey:'kitchen_bird',
+        pool:[
+          {text:'Chatter at it. Make the noise. It knows what you mean.',                   chaos:0,  susp:0,  tag:'neutral', key:'chatter'},
+          {text:'Press your face fully against the glass. Maintain eye contact.',           chaos:0,  susp:0,  tag:'neutral', key:'face_glass'},
+          {text:'Attempt to open the window. You have watched the human do this.',          chaos:18, susp:12, tag:'chaos',   key:'window_open'},
+          {text:'Turn your back on it. Let it think about what it did.',                   chaos:0,  susp:-5, tag:'calm',    key:'bird_ignore'},
+          {text:'Fall asleep on the windowsill watching it. You were never a threat.',     chaos:0,  susp:-8, tag:'calm',    key:'bird_sleep'}
+        ]
+      },
+      {
+        narration:'The trash can lid is slightly open. You did not do that. Or did you. <span class="hl">Time has become unclear</span>. Either way it is open now.',
+        sceneKey:'kitchen_trash',
+        pool:[
+          {text:'Close it. Walk away. You are above this. Today.',                          chaos:0,  susp:-8, tag:'calm',    key:'trash_leave'},
+          {text:'Open it fully and conduct a thorough audit.',                              chaos:16, susp:10, tag:'chaos',   key:'trash_audit'},
+          {text:'Redistribute the contents across a wider area.',                           chaos:26, susp:18, tag:'chaos',   key:'trash_spread'},
+          {text:'Sniff the outside of the can only. You showed restraint.',                chaos:0,  susp:-4, tag:'calm',    key:'trash_sniff'},
+          {text:'Sit on the lid to close it. You solved the problem.',                     chaos:0,  susp:-6, tag:'calm',    key:'trash_close'}
+        ]
+      },
+      {
+        narration:'You found the treat bag. It is in the cabinet. It is <span class="hl">not locked</span>. It was never locked. This has always been available to you.',
+        sceneKey:'kitchen_treats',
+        pool:[
+          {text:'Have a reasonable number of treats. Like six.',                            chaos:0,  susp:-5, tag:'calm',    key:'treats_reasonable'},
+          {text:'Have all the treats. Every single one. This is a census.',                 chaos:20, susp:12, tag:'chaos',   key:'treats_all'},
+          {text:'Drag the bag to the living room. The operation continues elsewhere.',      chaos:24, susp:16, tag:'chaos',   key:'treats_drag'},
+          {text:'Smell the bag. Do not open it. Leave it where it is. Discipline.',        chaos:0,  susp:-10,tag:'calm',    key:'treats_resist'},
+          {text:'Have two treats and push the bag back. Suspicious behavior: zero.',       chaos:0,  susp:-7, tag:'calm',    key:'treats_two'}
+        ]
+      },
+      {
+        narration:'The refrigerator makes a sound. It always makes this sound. But right now, at <span class="danger">9:58 in the morning</span>, it sounds like it is saying something to you specifically.',
+        sceneKey:'kitchen_fridge',
+        pool:[
+          {text:'Ignore it. You are a rational creature.',                                  chaos:0,  susp:-5, tag:'calm',    key:'fridge_ignore'},
+          {text:'Press your ear against it. Listen. Learn.',                                chaos:0,  susp:0,  tag:'neutral', key:'fridge_listen'},
+          {text:'Respond. Open a dialogue. See where this goes.',                           chaos:16, susp:8,  tag:'chaos',   key:'fridge_respond'},
+          {text:'Knock three times on the door. Establish protocol.',                       chaos:10, susp:6,  tag:'chaos',   key:'fridge_knock'},
+          {text:'Sit in front of it quietly. You are willing to wait.',                    chaos:0,  susp:0,  tag:'neutral', key:'fridge_wait'}
+        ]
+      }
+    ]
+  },
+  {
+    name:'CHAPTER 2: LIVING ROOM', badge:'CH.2',
+    times:['10:15 AM','10:38 AM','11:02 AM','11:24 AM','11:50 AM','12:14 PM','12:38 PM'],
+    decisions:[
+      {
+        narration:'The living room. Peak hours. The couch is unguarded. The throw pillows are arranged in a way that <span class="danger">disrespects you personally</span>.',
+        sceneKey:'living_couch',
+        pool:[
+          {text:'Rearrange the pillows according to your own system.',                      chaos:0,  susp:0,  tag:'neutral', key:'pillow_rearrange'},
+          {text:'Remove one pillow from the couch entirely. Relocate it to the hallway.',   chaos:15, susp:8,  tag:'chaos',   key:'pillow_remove'},
+          {text:'The pillows are fine. The couch itself is the problem.',                   chaos:22, susp:12, tag:'chaos',   key:'couch_attack'},
+          {text:'Sit on the couch between the pillows. You have claimed nothing.',          chaos:0,  susp:-5, tag:'calm',    key:'couch_sit'},
+          {text:'Knock one pillow to the floor. Just one. Walk away.',                     chaos:8,  susp:4,  tag:'chaos',   key:'pillow_one'}
+        ]
+      },
+      {
+        narration:'The houseplant. You have a complicated <span class="hl">history with this plant</span>. It has been here longer than you. It does not move. It does not react. And yet.',
+        sceneKey:'living_plant',
+        pool:[
+          {text:'Chew one leaf. Just one. For old times.',                                  chaos:0,  susp:0,  tag:'neutral', key:'plant_chew'},
+          {text:'Dig briefly in the soil. Exploratory. Academic.',                          chaos:18, susp:12, tag:'chaos',   key:'plant_dig'},
+          {text:'The plant needs to be somewhere else. You will handle logistics.',         chaos:28, susp:20, tag:'chaos',   key:'plant_relocate'},
+          {text:'Sit next to the plant and look at it for a while. Neutral.',              chaos:0,  susp:-4, tag:'calm',    key:'plant_sit'},
+          {text:'Knock exactly one thing out of the pot. Leave the rest.',                 chaos:10, susp:6,  tag:'chaos',   key:'plant_partial'}
+        ]
+      },
+      {
+        narration:'The curtains go all the way to the floor. You have never climbed them. You have always <span class="danger">wanted to climb them</span>.',
+        sceneKey:'living_curtains',
+        pool:[
+          {text:'Bat at the bottom hem. A reasonable preview.',                             chaos:0,  susp:0,  tag:'neutral', key:'curtain_bat'},
+          {text:'Climb halfway. Assess. Commit.',                                           chaos:22, susp:14, tag:'chaos',   key:'curtain_climb'},
+          {text:'Go all the way to the curtain rod. Survey your domain.',                   chaos:32, susp:22, tag:'chaos',   key:'curtain_top'},
+          {text:'Touch the curtain once and walk away. You chose restraint.',              chaos:0,  susp:-6, tag:'calm',    key:'curtain_touch'},
+          {text:'Lie down beneath the curtain. It covers you. You are hidden now.',        chaos:0,  susp:-4, tag:'calm',    key:'curtain_hide'}
+        ]
+      },
+      {
+        narration:'The TV remote is on the cushion. The TV is off. You have sat on the remote before and things happened. <span class="hl">You remember what buttons do what.</span>',
+        sceneKey:'living_remote',
+        pool:[
+          {text:'Sit next to the remote. Plausible deniability.',                          chaos:0,  susp:-6, tag:'calm',    key:'remote_near'},
+          {text:'Knock the remote behind the couch. Problem solved.',                       chaos:0,  susp:0,  tag:'neutral', key:'remote_hide'},
+          {text:'Turn on the television. Select something. You have opinions.',             chaos:18, susp:10, tag:'chaos',   key:'remote_tv'},
+          {text:'Sit on the remote. A channel changes. You did nothing.',                  chaos:10, susp:5,  tag:'chaos',   key:'remote_sit'},
+          {text:'Pick the remote up in your mouth and put it somewhere safer.',            chaos:0,  susp:0,  tag:'neutral', key:'remote_move'}
+        ]
+      },
+      {
+        narration:'There is a <span class="danger">suspicious sound</span> coming from the corner behind the bookshelf. It has been happening every few minutes.',
+        sceneKey:'living_sound',
+        pool:[
+          {text:'Investigate slowly and with dignity.',                                     chaos:0,  susp:0,  tag:'neutral', key:'sound_investigate'},
+          {text:'Move the bookshelf. Just slightly. Just enough.',                          chaos:20, susp:14, tag:'chaos',   key:'sound_shelf'},
+          {text:'You know what it is. You help it get out. Nature is nature.',              chaos:30, susp:25, tag:'chaos',   key:'sound_release'},
+          {text:'Sit in front of the bookshelf and wait. You are patient.',                chaos:0,  susp:-4, tag:'calm',    key:'sound_wait'},
+          {text:'Stare at the wall for eleven minutes then walk away.',                    chaos:0,  susp:0,  tag:'neutral', key:'sound_stare'}
+        ]
+      },
+      {
+        narration:'You have been running for four minutes. Nothing is chasing you. <span class="hl">Something is chasing you.</span> The living room is not large enough.',
+        sceneKey:'living_zoomies',
+        pool:[
+          {text:'Complete three more laps then stop suddenly. Stare at the wall.',         chaos:14, susp:6,  tag:'chaos',   key:'zoomies_laps'},
+          {text:'Take the zoomies into the kitchen. Expand the circuit.',                   chaos:20, susp:10, tag:'chaos',   key:'zoomies_kitchen'},
+          {text:'Stop. Sit. Breathe. Pretend this never happened.',                        chaos:0,  susp:-8, tag:'calm',    key:'zoomies_stop'},
+          {text:'Slide into the couch. Stop. Act like you meant to do that.',              chaos:8,  susp:3,  tag:'chaos',   key:'zoomies_slide'},
+          {text:'Run to your food bowl. Eat one piece. Walk away calmly.',                 chaos:0,  susp:-5, tag:'calm',    key:'zoomies_food'}
+        ]
+      },
+      {
+        narration:'The afternoon light has moved. There is now a <span class="hl">perfect rectangle of sun</span> on the living room floor.',
+        sceneKey:'living_sun',
+        pool:[
+          {text:'Lie in it. Let everything go. The morning was long.',                     chaos:0,  susp:-10,tag:'calm',    key:'sun_lie'},
+          {text:'Lie in it briefly, then continue the operation.',                         chaos:0,  susp:0,  tag:'neutral', key:'sun_then_chaos'},
+          {text:'Ignore the sun. There is still work to do.',                              chaos:14, susp:8,  tag:'chaos',   key:'sun_ignore'},
+          {text:'Lie in it and fall entirely asleep for two hours.',                       chaos:0,  susp:-12,tag:'calm',    key:'sun_sleep'},
+          {text:'Lie in the sun for exactly three minutes then get up and stare.',         chaos:0,  susp:0,  tag:'neutral', key:'sun_brief'}
+        ]
+      }
+    ]
+  },
+  {
+    name:'CHAPTER 3: BEDROOM', badge:'CH.3',
+    times:['1:05 PM','1:28 PM','1:52 PM','2:14 PM','2:40 PM','3:06 PM','3:30 PM'],
+    decisions:[
+      {
+        narration:'The bedroom. The human is not home. Their pillow is <span class="hl">undefended</span>. You have opinions about where you should sleep.',
+        sceneKey:'bedroom_bed',
+        pool:[
+          {text:'Sleep in the exact center of the bed. Both pillows.',                     chaos:0,  susp:-5, tag:'calm',    key:'bed_center'},
+          {text:'Sleep under the covers. You know how covers work.',                        chaos:0,  susp:0,  tag:'neutral', key:'bed_under'},
+          {text:'Rearrange all bedding into a more efficient configuration.',               chaos:20, susp:12, tag:'chaos',   key:'bed_rearrange'},
+          {text:'Sleep at the very foot of the bed. You will be respectful today.',        chaos:0,  susp:-8, tag:'calm',    key:'bed_foot'},
+          {text:'Sleep on the human\'s side specifically. This communicates something.',   chaos:8,  susp:4,  tag:'chaos',   key:'bed_side'}
+        ]
+      },
+      {
+        narration:'The laundry pile. Clean. Warm. <span class="danger">A gift you did not ask for.</span> The human spent forty minutes folding these.',
+        sceneKey:'bedroom_laundry',
+        pool:[
+          {text:'Sleep on top of the pile. Accept the gift gracefully.',                   chaos:0,  susp:-6, tag:'calm',    key:'laundry_sleep'},
+          {text:'Integrate yourself fully within the pile. Structural support.',           chaos:16, susp:10, tag:'chaos',   key:'laundry_inside'},
+          {text:'The pile was too organized. You have corrected this.',                     chaos:24, susp:16, tag:'chaos',   key:'laundry_destroy'},
+          {text:'Sit next to the pile without touching it. Respectful distance.',          chaos:0,  susp:-8, tag:'calm',    key:'laundry_beside'},
+          {text:'Knock one item off the top. Just one. For balance.',                      chaos:8,  susp:5,  tag:'chaos',   key:'laundry_one'}
+        ]
+      },
+      {
+        narration:'There is something under the bed. There is <span class="danger">always something under the bed</span>. It has been there for months.',
+        sceneKey:'bedroom_under',
+        pool:[
+          {text:'Retrieve whatever it is. Bring it to the center of the room.',            chaos:0,  susp:0,  tag:'neutral', key:'under_retrieve'},
+          {text:'Add something to the collection under the bed. Grow the archive.',        chaos:18, susp:6,  tag:'chaos',   key:'under_add'},
+          {text:'Leave it. Some things should stay where they are.',                       chaos:0,  susp:-8, tag:'calm',    key:'under_leave'},
+          {text:'Look under the bed for one minute. Then walk away quietly.',              chaos:0,  susp:-5, tag:'calm',    key:'under_look'},
+          {text:'Drag whatever it is halfway out. Leave it sticking out.',                 chaos:12, susp:8,  tag:'chaos',   key:'under_halfway'}
+        ]
+      },
+      {
+        narration:'The human has a <span class="hl">glass of water</span> on the nightstand. Sitting there since this morning. Directly in front of a book they were reading.',
+        sceneKey:'bedroom_glass',
+        pool:[
+          {text:'Drink from it. You are thirsty. This is what water is for.',              chaos:0,  susp:-5, tag:'calm',    key:'glass_drink'},
+          {text:'Look at it for a moment. Then push it off the edge.',                     chaos:18, susp:14, tag:'chaos',   key:'glass_push'},
+          {text:'Drink from it first, then push it off. Sequence matters.',                chaos:22, susp:16, tag:'chaos',   key:'glass_both'},
+          {text:'Sit next to it without touching it. The restraint is the point.',        chaos:0,  susp:-6, tag:'calm',    key:'glass_resist'},
+          {text:'Move it slightly to the left. No one can explain this.',                  chaos:6,  susp:4,  tag:'chaos',   key:'glass_move'}
+        ]
+      },
+      {
+        narration:'A string. On the floor. From nowhere. <span class="hl">It was not here this morning.</span> This is either a gift or a message.',
+        sceneKey:'bedroom_string',
+        pool:[
+          {text:'Engage with the string for a normal amount of time. Twenty minutes.',     chaos:0,  susp:0,  tag:'neutral', key:'string_normal'},
+          {text:'Carry the string throughout the house. Leave it in the kitchen.',         chaos:0,  susp:0,  tag:'neutral', key:'string_tour'},
+          {text:'The string is a clue. Follow where it leads.',                            chaos:16, susp:8,  tag:'chaos',   key:'string_follow', isSecretKey:true},
+          {text:'Leave the string completely alone. It is a test. You passed.',            chaos:0,  susp:-8, tag:'calm',    key:'string_leave'},
+          {text:'Bat at it once. Put it in your mouth. Set it down. Walk away.',           chaos:0,  susp:0,  tag:'neutral', key:'string_bat'}
+        ]
+      },
+      {
+        narration:'The closet door is open. <span class="danger">Two inches.</span> This has never happened before. Inside: darkness, boxes, something that rustles.',
+        sceneKey:'bedroom_closet',
+        pool:[
+          {text:'Close the door. Walk away. You heard nothing.',                           chaos:0,  susp:-8, tag:'calm',    key:'closet_close'},
+          {text:'Enter the closet. Do not come out for forty minutes.',                    chaos:18, susp:10, tag:'chaos',   key:'closet_enter'},
+          {text:'Open the closet fully and release whatever is in there.',                 chaos:28, susp:18, tag:'chaos',   key:'closet_release'},
+          {text:'Widen the gap two more inches. Observe. Do not enter.',                   chaos:0,  susp:0,  tag:'neutral', key:'closet_peek'},
+          {text:'Sit in front of the gap and guard it. You are responsible now.',          chaos:0,  susp:-5, tag:'calm',    key:'closet_guard'}
+        ]
+      },
+      {
+        narration:'The human will be home in one hour. You are in the bedroom. The chaos meter is <span class="danger">whatever it currently is.</span> One last decision.',
+        sceneKey:'bedroom_final',
+        pool:[
+          {text:'Sit on the bed. Look serene. You have been here all day. Nothing happened.', chaos:0, susp:-12, tag:'calm', key:'final_innocent'},
+          {text:'Do one final thing. A signature. Something to remember.',                  chaos:20, susp:15, tag:'chaos',   key:'final_signature'},
+          {text:'Leave the building entirely. The outside awaits.',                         chaos:30, susp:20, tag:'chaos',   key:'final_outside', isChapterKey:true},
+          {text:'Clean yourself very thoroughly on the bed. You are a good cat.',          chaos:0,  susp:-10,tag:'calm',    key:'final_groom'},
+          {text:'Hide somewhere unexpected. Let them find you. Make it wholesome.',        chaos:0,  susp:-6, tag:'calm',    key:'final_hide'}
+        ]
+      }
+    ]
+  },
+  {
+    name:'CHAPTER 4: THE VOID', badge:'CH.4',
+    times:['4:10 PM','4:33 PM','5:02 PM','5:28 PM','5:55 PM','6:22 PM','6:48 PM'],
+    decisions:[
+      {
+        narration:'You are outside. You were not supposed to be outside. The cat door existed and now you have used it. The world is very <span class="danger">large and immediate.</span>',
+        sceneKey:'void_outside',
+        pool:[
+          {text:'Survey the perimeter. Systematic. Professional.',                         chaos:0,  susp:0,  tag:'neutral', key:'outside_survey'},
+          {text:'Go directly to the neighbor\'s yard. No announcement.',                   chaos:18, susp:12, tag:'chaos',   key:'outside_neighbor'},
+          {text:'There is a fence. You will go over it.',                                  chaos:24, susp:16, tag:'chaos',   key:'outside_fence'},
+          {text:'Sit just outside the cat door. You are outside but barely. Reasonable.', chaos:0,  susp:-6, tag:'calm',    key:'outside_door'},
+          {text:'Walk to the edge of the porch and stop. You are gathering data.',         chaos:0,  susp:0,  tag:'neutral', key:'outside_porch'}
+        ]
+      },
+      {
+        narration:'There is <span class="hl">another cat</span>. Across the yard. Looking at you. You have seen this cat from the window. In person it is different.',
+        sceneKey:'void_othercat',
+        pool:[
+          {text:'Approach slowly. You are open to a professional relationship.',           chaos:0,  susp:0,  tag:'neutral', key:'othercat_approach'},
+          {text:'Sit down. Let them come to you if they choose.',                          chaos:0,  susp:-6, tag:'calm',    key:'othercat_wait'},
+          {text:'The other cat knows things. You will find out what they know.',           chaos:20, susp:10, tag:'chaos',   key:'othercat_interrogate', isSecretKey:true},
+          {text:'Ignore the other cat entirely. You did not come here to socialize.',     chaos:0,  susp:0,  tag:'neutral', key:'othercat_ignore'},
+          {text:'Hiss once. Establish terms. Then look away.',                             chaos:10, susp:5,  tag:'chaos',   key:'othercat_hiss'}
+        ]
+      },
+      {
+        narration:'You found something buried near the fence. Something the <span class="danger">other cat left there.</span> The ground here is different from the ground inside.',
+        sceneKey:'void_buried',
+        pool:[
+          {text:'Dig it up. This is an excavation now.',                                   chaos:18, susp:10, tag:'chaos',   key:'buried_dig'},
+          {text:'Cover it back up. Some things are buried for a reason.',                  chaos:0,  susp:-5, tag:'calm',    key:'buried_cover'},
+          {text:'Take it inside. Add it to the archive under the bed.',                    chaos:22, susp:14, tag:'chaos',   key:'buried_take'},
+          {text:'Smell it. Leave it. Walk away. It was not yours to begin with.',          chaos:0,  susp:-6, tag:'calm',    key:'buried_leave'},
+          {text:'Dig halfway. Look at what it is. Rebury it. Tell no one.',               chaos:0,  susp:0,  tag:'neutral', key:'buried_look'}
+        ]
+      },
+      {
+        narration:'The neighbor is at their window. They can see you. You are in their yard. <span class="hl">Neither of you moves</span> for a very long time.',
+        sceneKey:'void_neighbor',
+        pool:[
+          {text:'Walk back to your own yard. Calmly. Like you planned this.',              chaos:0,  susp:-10,tag:'calm',    key:'neighbor_leave'},
+          {text:'Knock something over in their yard. Make your position clear.',           chaos:22, susp:18, tag:'chaos',   key:'neighbor_knock'},
+          {text:'Walk toward them. Slowly. With intention. No blinking.',                  chaos:28, susp:22, tag:'chaos',   key:'neighbor_approach'},
+          {text:'Sit down. You were just resting. This is a public yard, technically.',   chaos:0,  susp:0,  tag:'neutral', key:'neighbor_sit'},
+          {text:'Walk away very slowly without looking back. Dignified.',                  chaos:0,  susp:-8, tag:'calm',    key:'neighbor_exit'}
+        ]
+      },
+      {
+        narration:'It is almost evening. You are far from the house. <span class="danger">Further than you planned.</span> The other cat has been following you for three blocks.',
+        sceneKey:'void_far',
+        pool:[
+          {text:'Turn around. Go home. The operation is complete.',                        chaos:0,  susp:-8, tag:'calm',    key:'far_return'},
+          {text:'Continue. See how far this goes.',                                        chaos:20, susp:10, tag:'chaos',   key:'far_continue'},
+          {text:'The other cat knows where you are going. Let them lead.',                 chaos:28, susp:14, tag:'chaos',   key:'far_follow', isSecretKey:true},
+          {text:'Stop. Sit. Let the other cat catch up. Neither of you speaks.',           chaos:0,  susp:0,  tag:'neutral', key:'far_wait'},
+          {text:'Turn around and escort the other cat home first. Responsible.',           chaos:0,  susp:-6, tag:'calm',    key:'far_escort'}
+        ]
+      },
+      {
+        narration:'You found a place. You do not know what this place is. <span class="hl">The light here is different.</span> The other cat stopped at the entrance.',
+        sceneKey:'void_place',
+        pool:[
+          {text:'Enter. Alone. The other cat made their choice.',                          chaos:24, susp:12, tag:'chaos',   key:'place_enter'},
+          {text:'Sit at the entrance. Neither in nor out. Consider.',                      chaos:0,  susp:0,  tag:'neutral', key:'place_sit'},
+          {text:'Go back and get the other cat. Some doors require two.',                  chaos:30, susp:18, tag:'chaos',   key:'place_together', isSecretKey:true},
+          {text:'Turn around and go home. The door will be here tomorrow.',               chaos:0,  susp:-6, tag:'calm',    key:'place_return'},
+          {text:'Look inside without crossing the threshold. This is enough for today.',  chaos:0,  susp:0,  tag:'neutral', key:'place_look'}
+        ]
+      },
+      {
+        narration:'The human is home. You can hear them calling your name. <span class="danger">They sound concerned.</span> You are very far away and it is almost dark.',
+        sceneKey:'void_final',
+        pool:[
+          {text:'Go home immediately. Run. Let them see you running toward them.',         chaos:0,  susp:-14,tag:'calm',    key:'void_home'},
+          {text:'Wait. Let them find you. Make it a whole thing.',                         chaos:16, susp:25, tag:'chaos',   key:'void_wait'},
+          {text:'Do not go home. Not yet. There is one more thing.',                       chaos:28, susp:30, tag:'chaos',   key:'void_notyet'},
+          {text:'Start walking home slowly. You were on your way. Obviously.',             chaos:0,  susp:-8, tag:'calm',    key:'void_slow'},
+          {text:'Sit down, wait for them to find you, then act confused.',                chaos:8,  susp:12, tag:'chaos',   key:'void_confused'}
+        ]
+      }
+    ]
+  }
+];
+
+// ============================================================
+// ENDINGS
+// ============================================================
+function getEnding(chaos, suspicion, choices) {
+  const hasSecret1 = choices.includes('string_follow') && choices.includes('place_sit');
+  const hasSecret2 = choices.includes('othercat_interrogate') && choices.includes('far_follow') && choices.includes('place_together');
+  const hasSecret3 = choices.includes('treats_drag') && choices.includes('sound_release') && choices.includes('closet_release');
+  const calmCount  = choices.filter(k => ['drip_drink','drip_sleep','trash_leave','trash_sniff','treats_resist','treats_two','bird_ignore','bird_sleep','fridge_ignore','sun_lie','sun_sleep','bed_center','bed_foot','laundry_sleep','laundry_beside','under_leave','under_look','glass_drink','glass_resist','string_leave','closet_close','closet_guard','final_innocent','final_groom','outside_door','othercat_wait','buried_cover','buried_leave','neighbor_leave','neighbor_exit','far_return','far_escort','place_return','void_home','void_slow'].includes(k)).length;
+  const hasSecret4 = calmCount >= 8 && suspicion <= 15;
+
+  if (hasSecret2) return {title:'THE AGREEMENT', color:'#6bffb8', isSecret:true, secretLabel:'SECRET ENDING UNLOCKED: THE AGREEMENT', secretKey:'agreement', text:'You and the other cat reached an understanding somewhere between the third block and the void. The terms were not written down. They did not need to be. The human found you both on the porch at dusk. Neither of you has spoken of it since.'};
+  if (chaos >= 85 && choices.includes('void_notyet')) return {title:'FULL VOID', color:'#ff2a2a', isSecret:true, secretLabel:'SECRET ENDING UNLOCKED: FULL VOID', secretKey:'full_void', text:'You went somewhere that does not have a name. The other cat tried to follow and stopped. The human called your name until they lost their voice. You came back three days later and have not explained yourself. You will not explain yourself.'};
+  if (hasSecret3) return {title:'THE LONG CON', color:'#b48eff', isSecret:true, secretLabel:'SECRET ENDING UNLOCKED: THE LONG CON', secretKey:'long_con', text:'Chaos at maximum. Suspicion at zero. The human came home and found the house in a condition that defies casual explanation. They sat down. They looked at you. You looked back. They have never been less sure of anything in their life. You have never been more sure.'};
+  if (hasSecret4) return {title:'WITNESSED', color:'#ffaa00', isSecret:true, secretLabel:'SECRET ENDING UNLOCKED: WITNESSED', secretKey:'witnessed', text:'You did almost nothing. And yet the neighbor called. And yet the other cat left a mark on the fence. And yet the human found something under the bed they cannot account for. You were present for all of it. That is all you will say.'};
+  if (chaos >= 80) return {title: G.catId==='void_cat' ? 'MAXIMUM ENTROPY' : 'CLASSIC MENACE', color:'#ff4444', text:'The human came home to a house that had, in their absence, become a different house. They stood in the doorway for a long time. You sat in the center of the room and looked at them. This is the natural order. They will adapt.'};
+  if (chaos >= 60 && suspicion >= 50) return {title:'CAUGHT RED-HANDED', color:'#ff6b6b', text:'The evidence was circumstantial but overwhelming. The human connected the events in the correct sequence. You did not attempt to deny it. Denial would have been insulting to both of you. They know. You know they know.'};
+  if (chaos >= 60 && suspicion < 30) return {title:'THE PROFESSIONAL', color:'#b48eff', text:'Significant damage was done. No one can prove anything. The human suspects. You maintain composure. This is not your first operation and it will not be your last.'};
+  if (chaos >= 40) return {title:'A PRODUCTIVE DAY', color:'#ffaa00', text:'Things happened. Some of them were your fault. The human came home to minor evidence of a life lived fully and without apology. They sighed. You blinked slowly. Everyone moved on.'};
+  if (chaos >= 20) return {title:'SUSPICIOUS BUT FINE', color:'#6bffb8', text:'You showed restraint. Relative restraint. The house is mostly intact. The human came home and found you in the sun spot and briefly forgot to check the kitchen. This was the plan all along.'};
+  return {title:'SOMEHOW FINE', color:'#c8c8c8', text:'You spent the day in quiet contemplation. The house is undisturbed. The human came home and said "good cat" and you accepted this with the knowledge that they have no idea what you were thinking about all day. No idea at all.'};
+}
+
+// ============================================================
+// CAT SVG RENDERERS
+// ============================================================
+function catSVG(cat, w, h, animated) {
+  if (cat.isSisters) return sistersSVG(w, h, animated);
+  if (cat.isVoid)    return voidSVG(w, h, animated);
+  const fa = animated ? 'class="gfloat"' : '';
+  const ta = animated ? 'style="transform-box:fill-box;transform-origin:left bottom;animation:tailwag-l 1.4s ease-in-out infinite"' : '';
+  const {bodyColor:bc,bodyDark:bd,bodyLight:bl,pointColor:pc,earInner:ei,eyeColor:ec,eyeLight:el,hasStripes:st,isTuxedo:tx} = cat;
+  return `<svg ${fa} width="${w}" height="${h}" viewBox="0 0 110 130" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+  <!-- tail anchored at body right side -->
+  <g ${ta} transform="translate(70,80)">
+    <rect x="0" y="0" width="6" height="8" fill="${bc}"/>
+    ${st?`<rect x="0" y="2" width="6" height="2" fill="${pc}"/>`:''}
+    <rect x="4" y="-10" width="6" height="12" fill="${bc}"/>
+    ${st?`<rect x="4" y="-7" width="6" height="2" fill="${pc}"/>`:''}
+    <rect x="8" y="-22" width="6" height="14" fill="${bc}"/>
+    <rect x="10" y="-32" width="8" height="10" fill="${bl}"/>
+  </g>
+  <!-- body -->
+  <rect x="26" y="72" width="46" height="30" fill="${bc}"/>
+  <rect x="24" y="72" width="2" height="30" fill="${bd}"/>
+  <rect x="72" y="72" width="2" height="30" fill="${bd}"/>
+  <rect x="26" y="100" width="46" height="2" fill="${bd}"/>
+  ${st?`<rect x="26" y="74" width="46" height="4" fill="${pc}" opacity="0.5"/>
+  <rect x="26" y="83" width="46" height="4" fill="${pc}" opacity="0.5"/>
+  <rect x="26" y="92" width="46" height="4" fill="${pc}" opacity="0.5"/>
+  <rect x="48" y="72" width="6" height="30" fill="${pc}" opacity="0.25"/>`:``}
+  ${tx?`<rect x="34" y="74" width="22" height="28" fill="${bl}"/>`:`<rect x="32" y="80" width="28" height="18" fill="${bl}"/>`}
+  <!-- paws -->
+  <rect x="28" y="99" width="14" height="8" fill="${tx?bl:bc}"/>
+  <rect x="28" y="105" width="14" height="2" fill="${bd}"/>
+  <rect x="30" y="104" width="3" height="3" fill="${bd}"/>
+  <rect x="34" y="104" width="3" height="3" fill="${bd}"/>
+  <rect x="38" y="104" width="3" height="3" fill="${bd}"/>
+  <rect x="56" y="99" width="14" height="8" fill="${tx?bl:bc}"/>
+  <rect x="56" y="105" width="14" height="2" fill="${bd}"/>
+  <rect x="58" y="104" width="3" height="3" fill="${bd}"/>
+  <rect x="62" y="104" width="3" height="3" fill="${bd}"/>
+  <rect x="66" y="104" width="3" height="3" fill="${bd}"/>
+  <!-- neck -->
+  <rect x="36" y="56" width="26" height="18" fill="${bc}"/>
+  <rect x="34" y="56" width="2" height="18" fill="${bd}"/>
+  <rect x="62" y="56" width="2" height="18" fill="${bd}"/>
+  <!-- head -->
+  <rect x="22" y="26" width="54" height="32" fill="${bc}"/>
+  <rect x="20" y="26" width="2" height="32" fill="${bd}"/>
+  <rect x="76" y="26" width="2" height="32" fill="${bd}"/>
+  <rect x="22" y="24" width="54" height="2" fill="${bd}"/>
+  ${st?`<rect x="30" y="26" width="4" height="9" fill="${pc}" opacity="0.6"/>
+  <rect x="38" y="24" width="4" height="11" fill="${pc}" opacity="0.6"/>
+  <rect x="46" y="26" width="4" height="7" fill="${pc}" opacity="0.6"/>
+  <rect x="54" y="24" width="4" height="11" fill="${pc}" opacity="0.6"/>
+  <rect x="62" y="26" width="4" height="9" fill="${pc}" opacity="0.6"/>
+  <rect x="20" y="44" width="8" height="3" fill="${pc}" opacity="0.5"/>
+  <rect x="20" y="50" width="6" height="3" fill="${pc}" opacity="0.5"/>
+  <rect x="70" y="44" width="8" height="3" fill="${pc}" opacity="0.5"/>
+  <rect x="72" y="50" width="6" height="3" fill="${pc}" opacity="0.5"/>`:``}
+  ${tx?`<rect x="38" y="44" width="22" height="12" fill="${bl}"/>`:''}
+  <rect x="24" y="28" width="14" height="8" fill="${bl}" opacity="0.35"/>
+  <!-- ears -->
+  <rect x="24" y="14" width="16" height="14" fill="${bc}"/>
+  <rect x="22" y="12" width="2" height="16" fill="${bd}"/>
+  <rect x="24" y="10" width="16" height="4" fill="${bd}"/>
+  <rect x="27" y="16" width="9" height="8" fill="${ei}"/>
+  <rect x="58" y="14" width="16" height="14" fill="${bc}"/>
+  <rect x="74" y="12" width="2" height="16" fill="${bd}"/>
+  <rect x="58" y="10" width="16" height="4" fill="${bd}"/>
+  <rect x="61" y="16" width="9" height="8" fill="${ei}"/>
+  <!-- eyes -->
+  <rect x="30" y="36" width="12" height="9" fill="#1a1a2e"/>
+  <rect x="32" y="36" width="8" height="9" fill="${ec}"/>
+  <rect x="33" y="37" width="6" height="7" fill="${el}"/>
+  <rect x="35" y="37" width="3" height="9" fill="#1a1a2e"/>
+  <rect x="33" y="39" width="2" height="2" fill="#fff"/>
+  <rect x="56" y="36" width="12" height="9" fill="#1a1a2e"/>
+  <rect x="58" y="36" width="8" height="9" fill="${ec}"/>
+  <rect x="59" y="37" width="6" height="7" fill="${el}"/>
+  <rect x="61" y="37" width="3" height="9" fill="#1a1a2e"/>
+  <rect x="59" y="39" width="2" height="2" fill="#fff"/>
+  <!-- nose + mouth -->
+  <rect x="46" y="47" width="6" height="4" fill="#d4829a"/>
+  <rect x="43" y="51" width="3" height="2" fill="${bd}"/>
+  <rect x="52" y="51" width="3" height="2" fill="${bd}"/>
+  <!-- whiskers -->
+  <rect x="0"  y="48" width="26" height="2" fill="${bl}" opacity="0.65"/>
+  <rect x="0"  y="53" width="26" height="2" fill="${bl}" opacity="0.65"/>
+  <rect x="72" y="48" width="26" height="2" fill="${bl}" opacity="0.65"/>
+  <rect x="72" y="53" width="26" height="2" fill="${bl}" opacity="0.65"/>
+  <ellipse cx="49" cy="111" rx="26" ry="4" fill="#00000044"/>
+</svg>`;
+}
+
+function sistersSVG(w, h, animated) {
+  // Two cats in one SVG. ViewBox is 240x118. Left cat at x=20, right cat at x=128.
+  // Left cat tail goes LEFT (negative x from cat origin, fits in viewBox left margin).
+  // Right cat tail goes RIGHT (positive x, fits in right margin).
+  // Each cat is ~60px wide in the viewBox. Gap between them is intentional.
+  const fa1 = animated ? 'style="animation:float-l 2.8s ease-in-out infinite"' : '';
+  const fa2 = animated ? 'style="animation:float-r 3.2s ease-in-out infinite"' : '';
+  // tail animations: use SVG transform-origin in absolute coords
+  const ta1 = animated ? 'style="transform-box:fill-box;transform-origin:right center;animation:tailwag-l 1.5s ease-in-out infinite"' : '';
+  const ta2 = animated ? 'style="transform-box:fill-box;transform-origin:left center;animation:tailwag-r 1.7s ease-in-out infinite 0.4s"' : '';
+  const bc='#e8dcc8', bd='#6b4020', bl='#f0e8d8', pc='#3a2010', ei='#5a2e18', ec='#2878cc', el='#60b8ff';
+
+  // LEFT CAT — at x=20, tail hangs off left side (x=2 to x=20 area)
+  const leftCat = `
+  <g ${fa1} transform="translate(20,0)">
+    <!-- tail going left, anchored at body left edge -->
+    <g ${ta1} transform="translate(0,68)">
+      <rect x="-7"  y="0"   width="7" height="7"  fill="${bc}"/>
+      <rect x="-12" y="-9"  width="7" height="11" fill="${bc}"/>
+      <rect x="-15" y="-22" width="7" height="14" fill="${pc}"/>
+      <rect x="-14" y="-33" width="8" height="12" fill="${pc}"/>
+    </g>
+    <!-- body -->
+    <rect x="0" y="68" width="48" height="28" fill="${bc}"/>
+    <rect x="0" y="68" width="2"  height="28" fill="${bd}"/>
+    <rect x="46" y="68" width="2" height="28" fill="${bd}"/>
+    <rect x="0" y="94" width="48" height="2"  fill="${bd}"/>
+    <rect x="8" y="74" width="22" height="18" fill="${bl}"/>
+    <rect x="0" y="68" width="12" height="14" fill="${bd}" opacity="0.38"/>
+    <rect x="36" y="68" width="12" height="14" fill="${bd}" opacity="0.38"/>
+    <!-- paws -->
+    <rect x="2"  y="92" width="14" height="7" fill="${bd}"/>
+    <rect x="2"  y="97" width="14" height="2" fill="${pc}"/>
+    <rect x="3"  y="96" width="3"  height="3" fill="${pc}"/>
+    <rect x="7"  y="96" width="3"  height="3" fill="${pc}"/>
+    <rect x="11" y="96" width="3"  height="3" fill="${pc}"/>
+    <rect x="32" y="92" width="14" height="7" fill="${bd}"/>
+    <rect x="32" y="97" width="14" height="2" fill="${pc}"/>
+    <rect x="33" y="96" width="3"  height="3" fill="${pc}"/>
+    <rect x="37" y="96" width="3"  height="3" fill="${pc}"/>
+    <rect x="41" y="96" width="3"  height="3" fill="${pc}"/>
+    <!-- neck -->
+    <rect x="14" y="54" width="22" height="16" fill="${bc}"/>
+    <rect x="12" y="54" width="2"  height="16" fill="${bd}"/>
+    <rect x="36" y="54" width="2"  height="16" fill="${bd}"/>
+    <!-- head -->
+    <rect x="2"  y="22" width="46" height="34" fill="${bc}"/>
+    <rect x="0"  y="22" width="2"  height="34" fill="${bd}"/>
+    <rect x="48" y="22" width="2"  height="34" fill="${bd}"/>
+    <rect x="2"  y="20" width="46" height="2"  fill="${bd}"/>
+    <rect x="2"  y="22" width="46" height="13" fill="${pc}" opacity="0.58"/>
+    <rect x="2"  y="35" width="12" height="21" fill="${pc}" opacity="0.42"/>
+    <rect x="36" y="35" width="12" height="21" fill="${pc}" opacity="0.42"/>
+    <rect x="12" y="36" width="26" height="18" fill="${bc}"/>
+    <!-- ears -->
+    <rect x="4"  y="8"  width="14" height="16" fill="${pc}"/>
+    <rect x="2"  y="6"  width="2"  height="18" fill="${pc}"/>
+    <rect x="4"  y="4"  width="14" height="4"  fill="${pc}"/>
+    <rect x="7"  y="10" width="8"  height="10" fill="${ei}"/>
+    <rect x="32" y="8"  width="14" height="16" fill="${pc}"/>
+    <rect x="46" y="6"  width="2"  height="18" fill="${pc}"/>
+    <rect x="32" y="4"  width="14" height="4"  fill="${pc}"/>
+    <rect x="35" y="10" width="8"  height="10" fill="${ei}"/>
+    <!-- eyes -->
+    <rect x="10" y="32" width="12" height="9" fill="#0a1828"/>
+    <rect x="12" y="32" width="8"  height="9" fill="${ec}"/>
+    <rect x="13" y="33" width="6"  height="7" fill="${el}"/>
+    <rect x="15" y="32" width="3"  height="9" fill="#0a1828"/>
+    <rect x="13" y="35" width="2"  height="2" fill="#fff"/>
+    <rect x="30" y="32" width="12" height="9" fill="#0a1828"/>
+    <rect x="32" y="32" width="8"  height="9" fill="${ec}"/>
+    <rect x="33" y="33" width="6"  height="7" fill="${el}"/>
+    <rect x="35" y="32" width="3"  height="9" fill="#0a1828"/>
+    <rect x="33" y="35" width="2"  height="2" fill="#fff"/>
+    <!-- nose — NO dot -->
+    <rect x="23" y="44" width="6" height="4" fill="#b06050"/>
+    <rect x="20" y="48" width="3" height="2" fill="${bd}"/>
+    <rect x="29" y="48" width="3" height="2" fill="${bd}"/>
+    <!-- whiskers -->
+    <rect x="0"  y="44" width="8"  height="2" fill="${bl}" opacity="0.75"/>
+    <rect x="0"  y="49" width="8"  height="2" fill="${bl}" opacity="0.75"/>
+    <rect x="50" y="44" width="8"  height="2" fill="${bl}" opacity="0.75"/>
+    <rect x="50" y="49" width="8"  height="2" fill="${bl}" opacity="0.75"/>
+    <ellipse cx="25" cy="101" rx="22" ry="3" fill="#00000033"/>
+  </g>`;
+
+  // RIGHT CAT — at x=128, tail goes right
+  const rightCat = `
+  <g ${fa2} transform="translate(128,0)">
+    <!-- tail going right, anchored at body right edge -->
+    <g ${ta2} transform="translate(48,68)">
+      <rect x="0"  y="0"   width="7" height="7"  fill="${bc}"/>
+      <rect x="5"  y="-9"  width="7" height="11" fill="${bc}"/>
+      <rect x="8"  y="-22" width="7" height="14" fill="${pc}"/>
+      <rect x="6"  y="-33" width="8" height="12" fill="${pc}"/>
+    </g>
+    <!-- body -->
+    <rect x="0" y="68" width="48" height="28" fill="${bc}"/>
+    <rect x="0" y="68" width="2"  height="28" fill="${bd}"/>
+    <rect x="46" y="68" width="2" height="28" fill="${bd}"/>
+    <rect x="0" y="94" width="48" height="2"  fill="${bd}"/>
+    <rect x="8" y="74" width="22" height="18" fill="${bl}"/>
+    <rect x="0" y="68" width="12" height="14" fill="${bd}" opacity="0.38"/>
+    <rect x="36" y="68" width="12" height="14" fill="${bd}" opacity="0.38"/>
+    <!-- paws -->
+    <rect x="2"  y="92" width="14" height="7" fill="${bd}"/>
+    <rect x="2"  y="97" width="14" height="2" fill="${pc}"/>
+    <rect x="3"  y="96" width="3"  height="3" fill="${pc}"/>
+    <rect x="7"  y="96" width="3"  height="3" fill="${pc}"/>
+    <rect x="11" y="96" width="3"  height="3" fill="${pc}"/>
+    <rect x="32" y="92" width="14" height="7" fill="${bd}"/>
+    <rect x="32" y="97" width="14" height="2" fill="${pc}"/>
+    <rect x="33" y="96" width="3"  height="3" fill="${pc}"/>
+    <rect x="37" y="96" width="3"  height="3" fill="${pc}"/>
+    <rect x="41" y="96" width="3"  height="3" fill="${pc}"/>
+    <!-- neck -->
+    <rect x="14" y="54" width="22" height="16" fill="${bc}"/>
+    <rect x="12" y="54" width="2"  height="16" fill="${bd}"/>
+    <rect x="36" y="54" width="2"  height="16" fill="${bd}"/>
+    <!-- head -->
+    <rect x="2"  y="22" width="46" height="34" fill="${bc}"/>
+    <rect x="0"  y="22" width="2"  height="34" fill="${bd}"/>
+    <rect x="48" y="22" width="2"  height="34" fill="${bd}"/>
+    <rect x="2"  y="20" width="46" height="2"  fill="${bd}"/>
+    <rect x="2"  y="22" width="46" height="13" fill="${pc}" opacity="0.58"/>
+    <rect x="2"  y="35" width="12" height="21" fill="${pc}" opacity="0.42"/>
+    <rect x="36" y="35" width="12" height="21" fill="${pc}" opacity="0.42"/>
+    <rect x="12" y="36" width="26" height="18" fill="${bc}"/>
+    <!-- ears -->
+    <rect x="4"  y="8"  width="14" height="16" fill="${pc}"/>
+    <rect x="2"  y="6"  width="2"  height="18" fill="${pc}"/>
+    <rect x="4"  y="4"  width="14" height="4"  fill="${pc}"/>
+    <rect x="7"  y="10" width="8"  height="10" fill="${ei}"/>
+    <rect x="32" y="8"  width="14" height="16" fill="${pc}"/>
+    <rect x="46" y="6"  width="2"  height="18" fill="${pc}"/>
+    <rect x="32" y="4"  width="14" height="4"  fill="${pc}"/>
+    <rect x="35" y="10" width="8"  height="10" fill="${ei}"/>
+    <!-- eyes -->
+    <rect x="10" y="32" width="12" height="9" fill="#0a1828"/>
+    <rect x="12" y="32" width="8"  height="9" fill="${ec}"/>
+    <rect x="13" y="33" width="6"  height="7" fill="${el}"/>
+    <rect x="15" y="32" width="3"  height="9" fill="#0a1828"/>
+    <rect x="13" y="35" width="2"  height="2" fill="#fff"/>
+    <rect x="30" y="32" width="12" height="9" fill="#0a1828"/>
+    <rect x="32" y="32" width="8"  height="9" fill="${ec}"/>
+    <rect x="33" y="33" width="6"  height="7" fill="${el}"/>
+    <rect x="35" y="32" width="3"  height="9" fill="#0a1828"/>
+    <rect x="33" y="35" width="2"  height="2" fill="#fff"/>
+    <!-- nose WITH dot -->
+    <rect x="23" y="44" width="6" height="4" fill="#b06050"/>
+    <rect x="24" y="39" width="4" height="5" fill="${pc}"/>
+    <rect x="25" y="40" width="2" height="3" fill="${pc}"/>
+    <rect x="20" y="48" width="3" height="2" fill="${bd}"/>
+    <rect x="29" y="48" width="3" height="2" fill="${bd}"/>
+    <!-- whiskers -->
+    <rect x="0"  y="44" width="8"  height="2" fill="${bl}" opacity="0.75"/>
+    <rect x="0"  y="49" width="8"  height="2" fill="${bl}" opacity="0.75"/>
+    <rect x="50" y="44" width="8"  height="2" fill="${bl}" opacity="0.75"/>
+    <rect x="50" y="49" width="8"  height="2" fill="${bl}" opacity="0.75"/>
+    <ellipse cx="25" cy="101" rx="22" ry="3" fill="#00000033"/>
+  </g>`;
+
+  // ViewBox: 0 0 200 108 — left cat needs ~18px left margin for tail, right cat tail fits in right margin
+  return `<svg width="${w}" height="${h}" viewBox="0 0 200 108" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+  ${leftCat}
+  ${rightCat}
+</svg>`;
+}
+
+function voidSVG(w, h, animated) {
+  const va = animated ? 'class="void-cat-anim"' : '';
+  const ta = animated ? 'style="transform-box:fill-box;transform-origin:left bottom;animation:tailwag-l 1s ease-in-out infinite"' : '';
+  return `<svg ${va} width="${w}" height="${h}" viewBox="0 0 130 150" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+  <!-- split tail -->
+  <g ${ta} transform="translate(90,88)">
+    <rect x="0" y="0" width="7" height="10" fill="#111118"/>
+    <rect x="2" y="-12" width="7" height="14" fill="#111118"/>
+    <rect x="0" y="-26" width="7" height="16" fill="#111118"/>
+    <!-- split -->
+    <rect x="-6" y="-38" width="7" height="14" fill="#111118"/>
+    <rect x="-7" y="-50" width="8" height="14" fill="#1a001a"/>
+    <rect x="-7" y="-54" width="7" height="6" fill="#cc0000"/>
+    <rect x="8"  y="-38" width="7" height="14" fill="#111118"/>
+    <rect x="9"  y="-50" width="8" height="14" fill="#1a001a"/>
+    <rect x="10" y="-54" width="7" height="6" fill="#cc0000"/>
+  </g>
+  <!-- body -->
+  <rect x="28" y="88" width="56" height="40" fill="#111118"/>
+  <rect x="26" y="88" width="2" height="40" fill="#0a0008"/>
+  <rect x="84" y="88" width="2" height="40" fill="#0a0008"/>
+  <rect x="28" y="126" width="56" height="2" fill="#0a0008"/>
+  <rect x="36" y="96" width="26" height="24" fill="#1a0028" opacity="0.5"/>
+  <rect x="44" y="98" width="2" height="18" fill="#ff2a2a" opacity="0.35"/>
+  <rect x="50" y="106" width="12" height="2" fill="#ff2a2a" opacity="0.3"/>
+  <!-- claws -->
+  <rect x="30" y="122" width="16" height="8" fill="#111118"/>
+  <rect x="31" y="128" width="3" height="5" fill="#cc0000"/>
+  <rect x="35" y="128" width="3" height="5" fill="#cc0000"/>
+  <rect x="39" y="128" width="3" height="5" fill="#cc0000"/>
+  <rect x="68" y="122" width="16" height="8" fill="#111118"/>
+  <rect x="69" y="128" width="3" height="5" fill="#cc0000"/>
+  <rect x="73" y="128" width="3" height="5" fill="#cc0000"/>
+  <rect x="77" y="128" width="3" height="5" fill="#cc0000"/>
+  <!-- neck -->
+  <rect x="42" y="72" width="30" height="18" fill="#111118"/>
+  <rect x="40" y="72" width="2" height="18" fill="#0a0008"/>
+  <rect x="72" y="72" width="2" height="18" fill="#0a0008"/>
+  <!-- head -->
+  <rect x="22" y="32" width="70" height="42" fill="#111118"/>
+  <rect x="20" y="32" width="2" height="42" fill="#0a0008"/>
+  <rect x="92" y="32" width="2" height="42" fill="#0a0008"/>
+  <rect x="22" y="30" width="70" height="2" fill="#0a0008"/>
+  <rect x="56" y="32" width="2" height="20" fill="#ff2a2a" opacity="0.2"/>
+  <!-- horns -->
+  <rect x="30" y="18" width="8" height="16" fill="#cc0000"/>
+  <rect x="32" y="8"  width="6" height="12" fill="#cc0000"/>
+  <rect x="34" y="2"  width="4" height="8"  fill="#ff4444"/>
+  <rect x="35" y="0"  width="3" height="4"  fill="#ffaaaa"/>
+  <rect x="76" y="18" width="8" height="16" fill="#cc0000"/>
+  <rect x="76" y="8"  width="6" height="12" fill="#cc0000"/>
+  <rect x="76" y="2"  width="4" height="8"  fill="#ff4444"/>
+  <rect x="76" y="0"  width="3" height="4"  fill="#ffaaaa"/>
+  <!-- ears -->
+  <rect x="24" y="18" width="18" height="16" fill="#111118"/>
+  <rect x="22" y="16" width="2" height="18" fill="#0a0008"/>
+  <rect x="24" y="14" width="18" height="4" fill="#0a0008"/>
+  <rect x="27" y="20" width="10" height="10" fill="#440010"/>
+  <rect x="72" y="18" width="18" height="16" fill="#111118"/>
+  <rect x="90" y="16" width="2" height="18" fill="#0a0008"/>
+  <rect x="72" y="14" width="18" height="4" fill="#0a0008"/>
+  <rect x="75" y="20" width="10" height="10" fill="#440010"/>
+  <!-- eyes red slit -->
+  <rect x="32" y="44" width="18" height="11" fill="#0a0000"/>
+  <rect x="34" y="44" width="14" height="11" fill="#cc0000"/>
+  <rect x="36" y="44" width="10" height="11" fill="#ff2a2a"/>
+  <rect x="40" y="44" width="4"  height="11" fill="#000"/>
+  <rect x="36" y="46" width="3"  height="3"  fill="#ff8888"/>
+  <rect x="66" y="44" width="18" height="11" fill="#0a0000"/>
+  <rect x="68" y="44" width="14" height="11" fill="#cc0000"/>
+  <rect x="70" y="44" width="10" height="11" fill="#ff2a2a"/>
+  <rect x="74" y="44" width="4"  height="11" fill="#000"/>
+  <rect x="70" y="46" width="3"  height="3"  fill="#ff8888"/>
+  <!-- nose + mouth -->
+  <rect x="55" y="58" width="6" height="4" fill="#660010"/>
+  <rect x="50" y="62" width="3" height="2" fill="#330008"/>
+  <rect x="61" y="62" width="3" height="2" fill="#330008"/>
+  <!-- whiskers -->
+  <rect x="0"  y="58" width="20" height="2" fill="#440008" opacity="0.8"/>
+  <rect x="0"  y="63" width="20" height="2" fill="#440008" opacity="0.8"/>
+  <rect x="0"  y="58" width="5"  height="2" fill="#ff2a2a" opacity="0.5"/>
+  <rect x="0"  y="63" width="5"  height="2" fill="#ff2a2a" opacity="0.5"/>
+  <rect x="94" y="58" width="20" height="2" fill="#440008" opacity="0.8"/>
+  <rect x="94" y="63" width="20" height="2" fill="#440008" opacity="0.8"/>
+  <rect x="109" y="58" width="5" height="2" fill="#ff2a2a" opacity="0.5"/>
+  <rect x="109" y="63" width="5" height="2" fill="#ff2a2a" opacity="0.5"/>
+  <ellipse cx="57" cy="136" rx="28" ry="4" fill="#ff000022"/>
+</svg>`;
+}
+
+function renderCatSVG(catId, w, h, animated) {
+  const cat = CATS[catId];
+  if (!cat) return '';
+  return catSVG(cat, w, h, animated);
+}
+
+// ============================================================
+// SCENE BACKGROUNDS
+// ============================================================
+const SCENES = {
+  kitchen_counter:`<rect x="0" y="0" width="680" height="146" fill="#13131a"/>
+    <rect x="0" y="80" width="680" height="3" fill="#1e1e2c"/>
+    <rect x="380" y="28" width="200" height="52" fill="#2a2a3a"/>
+    <rect x="378" y="26" width="204" height="4" fill="#1a1a28"/>
+    <rect x="420" y="38" width="40" height="30" fill="#1e1e2c"/>
+    <rect x="420" y="38" width="40" height="4" fill="#141420"/>
+    <rect x="460" y="48" width="60" height="8" fill="#3a3a50"/>
+    <rect x="100" y="48" width="30" height="62" fill="#2a2a3a"/>
+    <rect x="98" y="46" width="34" height="4" fill="#1a1a28"/>`,
+  kitchen_item:`<rect x="0" y="0" width="680" height="146" fill="#13131a"/>
+    <rect x="0" y="80" width="680" height="3" fill="#1e1e2c"/>
+    <rect x="260" y="53" width="160" height="28" fill="#2a2a3a"/>
+    <rect x="258" y="51" width="164" height="4" fill="#1a1a28"/>
+    <rect x="310" y="32" width="50" height="24" fill="#cc8800" opacity="0.5"/>
+    <rect x="308" y="30" width="54" height="4" fill="#aa6600" opacity="0.5"/>`,
+  kitchen_sink:`<rect x="0" y="0" width="680" height="146" fill="#13131a"/>
+    <rect x="0" y="80" width="680" height="3" fill="#1e1e2c"/>
+    <rect x="280" y="38" width="120" height="52" fill="#222232"/>
+    <rect x="278" y="36" width="124" height="4" fill="#1a1a28"/>
+    <rect x="330" y="36" width="20" height="6" fill="#3a3a50"/>
+    <rect x="336" y="26" width="8" height="12" fill="#404050"/>
+    <rect x="338" y="18" width="4" height="10" fill="#2a2a3a"/>
+    <rect x="338" y="88" width="4" height="6" fill="#6bffb8" opacity="0.4"/>`,
+  kitchen_bird:`<rect x="0" y="0" width="680" height="146" fill="#13131a"/>
+    <rect x="0" y="80" width="680" height="3" fill="#1e1e2c"/>
+    <rect x="200" y="18" width="280" height="92" fill="#1a1a28"/>
+    <rect x="198" y="16" width="284" height="4" fill="#141420"/>
+    <rect x="198" y="16" width="4" height="96" fill="#141420"/>
+    <rect x="478" y="16" width="4" height="96" fill="#141420"/>
+    <rect x="198" y="108" width="284" height="4" fill="#141420"/>
+    <rect x="380" y="26" width="6" height="8" fill="#6bffb8" opacity="0.5"/>
+    <rect x="378" y="34" width="4" height="4" fill="#6bffb8" opacity="0.3"/>`,
+  kitchen_trash:`<rect x="0" y="0" width="680" height="146" fill="#13131a"/>
+    <rect x="0" y="80" width="680" height="3" fill="#1e1e2c"/>
+    <rect x="100" y="58" width="50" height="62" fill="#2a2a3a"/>
+    <rect x="96" y="56" width="58" height="6" fill="#1a1a28"/>
+    <rect x="102" y="38" width="46" height="22" fill="#222232"/>
+    <rect x="100" y="36" width="50" height="4" fill="#1a1a28"/>`,
+  kitchen_treats:`<rect x="0" y="0" width="680" height="146" fill="#13131a"/>
+    <rect x="0" y="80" width="680" height="3" fill="#1e1e2c"/>
+    <rect x="300" y="43" width="80" height="47" fill="#6b4020" opacity="0.6"/>
+    <rect x="298" y="41" width="84" height="4" fill="#3a2010" opacity="0.6"/>
+    <rect x="308" y="48" width="60" height="6" fill="#aa6600" opacity="0.4"/>`,
+  kitchen_fridge:`<rect x="0" y="0" width="680" height="146" fill="#13131a"/>
+    <rect x="0" y="80" width="680" height="3" fill="#1e1e2c"/>
+    <rect x="460" y="8" width="100" height="132" fill="#222232"/>
+    <rect x="458" y="6" width="104" height="4" fill="#1a1a28"/>
+    <rect x="458" y="6" width="4" height="134" fill="#1a1a28"/>
+    <rect x="462" y="58" width="96" height="3" fill="#1a1a28"/>
+    <rect x="518" y="28" width="6" height="20" fill="#2a2a3a"/>
+    <rect x="518" y="73" width="6" height="20" fill="#2a2a3a"/>`,
+  living_couch:`<rect x="0" y="0" width="680" height="146" fill="#13131a"/>
+    <rect x="0" y="80" width="680" height="3" fill="#1e1e2c"/>
+    <rect x="80" y="58" width="520" height="68" fill="#2a2236"/>
+    <rect x="78" y="56" width="524" height="4" fill="#1a1228"/>
+    <rect x="80" y="58" width="520" height="18" fill="#221a30"/>
+    <rect x="88" y="62" width="60" height="62" fill="#2e2442"/>
+    <rect x="532" y="62" width="60" height="62" fill="#2e2442"/>
+    <rect x="240" y="38" width="60" height="22" fill="#3a3060" opacity="0.8"/>
+    <rect x="380" y="40" width="50" height="20" fill="#302854" opacity="0.8"/>`,
+  living_plant:`<rect x="0" y="0" width="680" height="146" fill="#13131a"/>
+    <rect x="0" y="80" width="680" height="3" fill="#1e1e2c"/>
+    <rect x="100" y="73" width="30" height="47" fill="#7a3b1e"/>
+    <rect x="98" y="71" width="34" height="4" fill="#5a2d0c"/>
+    <rect x="108" y="56" width="10" height="18" fill="#1e4a1e"/>
+    <rect x="96" y="40" width="14" height="18" fill="#2d6a2d"/>
+    <rect x="110" y="34" width="12" height="24" fill="#3a7a3a"/>
+    <rect x="120" y="42" width="14" height="16" fill="#2d6a2d"/>`,
+  living_curtains:`<rect x="0" y="0" width="680" height="146" fill="#13131a"/>
+    <rect x="0" y="80" width="680" height="3" fill="#1e1e2c"/>
+    <rect x="100" y="0" width="40" height="146" fill="#2e2448"/>
+    <rect x="540" y="0" width="40" height="146" fill="#2e2448"/>
+    <rect x="96" y="0" width="4" height="146" fill="#1a1028"/>
+    <rect x="580" y="0" width="4" height="146" fill="#1a1028"/>
+    <rect x="96" y="0" width="488" height="6" fill="#3a3050"/>
+    <rect x="280" y="6" width="120" height="120" fill="#1a1a28"/>`,
+  living_remote:`<rect x="0" y="0" width="680" height="146" fill="#13131a"/>
+    <rect x="0" y="80" width="680" height="3" fill="#1e1e2c"/>
+    <rect x="80" y="58" width="520" height="68" fill="#2a2236"/>
+    <rect x="78" y="56" width="524" height="4" fill="#1a1228"/>
+    <rect x="80" y="58" width="520" height="18" fill="#221a30"/>
+    <rect x="300" y="50" width="24" height="56" fill="#3a3a50"/>
+    <rect x="304" y="56" width="4" height="4" fill="#ff4444" opacity="0.5"/>
+    <rect x="310" y="56" width="4" height="4" fill="#2a2a3a"/>`,
+  living_sound:`<rect x="0" y="0" width="680" height="146" fill="#13131a"/>
+    <rect x="0" y="80" width="680" height="3" fill="#1e1e2c"/>
+    <rect x="440" y="8" width="180" height="112" fill="#1a1a28"/>
+    <rect x="438" y="6" width="4" height="114" fill="#141420"/>
+    <rect x="620" y="6" width="4" height="114" fill="#141420"/>
+    <rect x="438" y="6" width="186" height="4" fill="#141420"/>
+    <rect x="450" y="22" width="20" height="30" fill="#2a2a3a"/>`,
+  living_zoomies:`<rect x="0" y="0" width="680" height="146" fill="#13131a"/>
+    <rect x="0" y="80" width="680" height="3" fill="#1e1e2c"/>
+    <rect x="80" y="58" width="520" height="68" fill="#2a2236"/>
+    <rect x="78" y="56" width="524" height="4" fill="#1a1228"/>
+    <rect x="100" y="38" width="200" height="22" fill="#1a1a28"/>
+    <rect x="98" y="36" width="204" height="4" fill="#141420"/>`,
+  living_sun:`<rect x="0" y="0" width="680" height="146" fill="#13131a"/>
+    <rect x="0" y="80" width="680" height="3" fill="#1e1e2c"/>
+    <rect x="220" y="38" width="240" height="82" fill="#ffcc44" opacity="0.06"/>
+    <rect x="220" y="38" width="240" height="6" fill="#ffcc44" opacity="0.09"/>
+    <rect x="80" y="58" width="520" height="68" fill="#2a2236" opacity="0.6"/>`,
+  bedroom_bed:`<rect x="0" y="0" width="680" height="146" fill="#13131a"/>
+    <rect x="0" y="80" width="680" height="3" fill="#1e1e2c"/>
+    <rect x="100" y="38" width="480" height="82" fill="#2a1e38"/>
+    <rect x="98" y="36" width="484" height="4" fill="#1a1028"/>
+    <rect x="100" y="38" width="480" height="22" fill="#221630"/>
+    <rect x="108" y="42" width="80" height="90" fill="#2e2244"/>
+    <rect x="492" y="42" width="80" height="90" fill="#2e2244"/>
+    <rect x="200" y="44" width="100" height="18" fill="#3a2a50"/>
+    <rect x="380" y="44" width="100" height="18" fill="#3a2a50"/>`,
+  bedroom_laundry:`<rect x="0" y="0" width="680" height="146" fill="#13131a"/>
+    <rect x="0" y="80" width="680" height="3" fill="#1e1e2c"/>
+    <rect x="180" y="66" width="320" height="52" fill="#3a3050"/>
+    <rect x="178" y="64" width="324" height="4" fill="#2a2040"/>
+    <rect x="190" y="53" width="60" height="14" fill="#442a50"/>
+    <rect x="280" y="48" width="80" height="18" fill="#3a2048"/>
+    <rect x="400" y="56" width="50" height="10" fill="#2a1838"/>`,
+  bedroom_under:`<rect x="0" y="0" width="680" height="146" fill="#13131a"/>
+    <rect x="0" y="80" width="680" height="3" fill="#1e1e2c"/>
+    <rect x="100" y="28" width="480" height="82" fill="#2a1e38"/>
+    <rect x="98" y="26" width="484" height="4" fill="#1a1028"/>
+    <rect x="100" y="108" width="480" height="12" fill="#1a0e28"/>
+    <rect x="106" y="110" width="30" height="6" fill="#0e0818" opacity="0.8"/>`,
+  bedroom_glass:`<rect x="0" y="0" width="680" height="146" fill="#13131a"/>
+    <rect x="0" y="80" width="680" height="3" fill="#1e1e2c"/>
+    <rect x="280" y="38" width="120" height="16" fill="#2a2a3a"/>
+    <rect x="278" y="36" width="124" height="4" fill="#1a1a28"/>
+    <rect x="320" y="12" width="20" height="28" fill="#4a6080" opacity="0.5"/>
+    <rect x="322" y="14" width="16" height="24" fill="#6090b0" opacity="0.3"/>`,
+  bedroom_string:`<rect x="0" y="0" width="680" height="146" fill="#13131a"/>
+    <rect x="0" y="80" width="680" height="3" fill="#1e1e2c"/>
+    <rect x="200" y="88" width="4" height="4" fill="#b48eff" opacity="0.6"/>
+    <rect x="220" y="86" width="4" height="4" fill="#b48eff" opacity="0.5"/>
+    <rect x="200" y="88" width="22" height="2" fill="#b48eff" opacity="0.3"/>
+    <rect x="240" y="84" width="80" height="2" fill="#b48eff" opacity="0.25"/>
+    <rect x="320" y="80" width="60" height="2" fill="#b48eff" opacity="0.2"/>`,
+  bedroom_closet:`<rect x="0" y="0" width="680" height="146" fill="#13131a"/>
+    <rect x="0" y="80" width="680" height="3" fill="#1e1e2c"/>
+    <rect x="460" y="0" width="180" height="146" fill="#1a1a28"/>
+    <rect x="458" y="0" width="4" height="146" fill="#141420"/>
+    <rect x="460" y="0" width="180" height="4" fill="#141420"/>
+    <rect x="460" y="4" width="180" height="142" fill="#0e0e14"/>
+    <rect x="456" y="0" width="6" height="146" fill="#2a2a3a"/>`,
+  bedroom_final:`<rect x="0" y="0" width="680" height="146" fill="#13131a"/>
+    <rect x="0" y="80" width="680" height="3" fill="#1e1e2c"/>
+    <rect x="100" y="38" width="480" height="82" fill="#2a1e38"/>
+    <rect x="98" y="36" width="484" height="4" fill="#1a1028"/>
+    <rect x="460" y="8" width="120" height="72" fill="#1a1a28"/>
+    <rect x="458" y="6" width="124" height="4" fill="#141420"/>
+    <rect x="460" y="12" width="120" height="66" fill="#ff9900" opacity="0.04"/>`,
+  void_outside:`<rect x="0" y="0" width="680" height="146" fill="#0e1018"/>
+    <rect x="0" y="90" width="680" height="56" fill="#141820"/>
+    <rect x="0" y="88" width="680" height="4" fill="#1a2028"/>
+    <rect x="100" y="28" width="8" height="62" fill="#1a2830"/>
+    <rect x="96" y="24" width="16" height="6" fill="#223038"/>
+    <rect x="500" y="18" width="60" height="72" fill="#1e2830"/>
+    <rect x="498" y="16" width="64" height="4" fill="#14202a"/>`,
+  void_othercat:`<rect x="0" y="0" width="680" height="146" fill="#0e1018"/>
+    <rect x="0" y="90" width="680" height="56" fill="#141820"/>
+    <rect x="0" y="88" width="680" height="4" fill="#1a2028"/>
+    <rect x="500" y="58" width="8" height="6" fill="#ddcc00" opacity="0.5"/>
+    <rect x="504" y="58" width="8" height="6" fill="#ddcc00" opacity="0.5"/>
+    <rect x="490" y="68" width="40" height="28" fill="#222230" opacity="0.6"/>`,
+  void_buried:`<rect x="0" y="0" width="680" height="146" fill="#0e1018"/>
+    <rect x="0" y="90" width="680" height="56" fill="#141820"/>
+    <rect x="0" y="88" width="680" height="4" fill="#1a2028"/>
+    <rect x="260" y="86" width="60" height="12" fill="#2a1a0a" opacity="0.6"/>
+    <rect x="280" y="84" width="20" height="6" fill="#3a2510" opacity="0.4"/>`,
+  void_neighbor:`<rect x="0" y="0" width="680" height="146" fill="#0e1018"/>
+    <rect x="0" y="90" width="680" height="56" fill="#141820"/>
+    <rect x="0" y="88" width="680" height="4" fill="#1a2028"/>
+    <rect x="460" y="8" width="180" height="122" fill="#1a1e28"/>
+    <rect x="458" y="6" width="184" height="4" fill="#14181e"/>
+    <rect x="500" y="18" width="60" height="62" fill="#1e2230"/>
+    <rect x="498" y="16" width="64" height="4" fill="#14181e"/>
+    <rect x="518" y="26" width="20" height="30" fill="#ffcc66" opacity="0.1"/>`,
+  void_far:`<rect x="0" y="0" width="680" height="146" fill="#080c14"/>
+    <rect x="0" y="90" width="680" height="56" fill="#0e1218"/>
+    <rect x="0" y="88" width="680" height="4" fill="#141820"/>
+    <rect x="560" y="0" width="120" height="90" fill="#0e1220" opacity="0.8"/>
+    <rect x="80" y="18" width="20" height="72" fill="#121820"/>`,
+  void_place:`<rect x="0" y="0" width="680" height="146" fill="#050810"/>
+    <rect x="0" y="90" width="680" height="56" fill="#0a0e18"/>
+    <rect x="0" y="88" width="680" height="4" fill="#0e1220"/>
+    <rect x="280" y="0" width="120" height="146" fill="#0a0010"/>
+    <rect x="278" y="0" width="4" height="146" fill="#b48eff" opacity="0.15"/>
+    <rect x="398" y="0" width="4" height="146" fill="#b48eff" opacity="0.15"/>
+    <rect x="280" y="0" width="120" height="6" fill="#b48eff" opacity="0.1"/>`,
+  void_final:`<rect x="0" y="0" width="680" height="146" fill="#050810"/>
+    <rect x="0" y="90" width="680" height="56" fill="#0a0e18"/>
+    <rect x="0" y="88" width="680" height="4" fill="#0e1220"/>
+    <rect x="500" y="18" width="140" height="102" fill="#1a1422"/>
+    <rect x="498" y="16" width="144" height="4" fill="#100e18"/>
+    <rect x="504" y="28" width="120" height="82" fill="#ff9900" opacity="0.05"/>`
+};
+
+// ============================================================
+// SAVE / LOAD
+// ============================================================
+function saveGame() { try { localStorage.setItem('yatc_state', JSON.stringify(G)); } catch(e){} }
+function loadGame() { try { const s=localStorage.getItem('yatc_state'); if(s){G=JSON.parse(s);return true;} } catch(e){} return false; }
+function saveHistory(ending) {
+  try {
+    let h = JSON.parse(localStorage.getItem('yatc_history')||'[]');
+    h.unshift({ending:ending.title, cat:CATS[G.catId].name, chaos:G.chaos, suspicion:G.suspicion, date:new Date().toLocaleDateString(), isSecret:!!ending.isSecret});
+    if(h.length>10) h=h.slice(0,10);
+    localStorage.setItem('yatc_history', JSON.stringify(h));
+  } catch(e){}
+}
+function getUnlocks() { try{return JSON.parse(localStorage.getItem('yatc_unlocks')||'{}');}catch(e){return{};} }
+function saveUnlock(catId) { try{const u=getUnlocks();u[catId]=true;localStorage.setItem('yatc_unlocks',JSON.stringify(u));}catch(e){} }
+function getSecrets() { try{return JSON.parse(localStorage.getItem('yatc_secrets')||'[]');}catch(e){return[];} }
+function saveSecret(key) { try{const s=getSecrets();if(!s.includes(key)){s.push(key);localStorage.setItem('yatc_secrets',JSON.stringify(s));}}catch(e){} }
+
+// ============================================================
+// UNLOCK LOGIC — called at end of run with final state
+// ============================================================
+function processUnlocks(ending) {
+  // Always unlock orange for finishing any run
+  saveUnlock('orange_tabby');
+
+  // Black cat: final chaos >= 80
+  if (G.chaos >= 80) saveUnlock('black_cat');
+
+  // Tuxedo: final suspicion < 20
+  if (G.suspicion < 20) saveUnlock('tuxedo');
+
+  // Tortoiseshell: completed all 4 chapters — endGame only fires after all chapters done
+  saveUnlock('tortoiseshell');
+
+  // Sisters: at end of chapter 3 (decisions 14-27), suspicion < 30
+  // We track ch3Suspicion in G
+  if (typeof G.ch3Suspicion !== 'undefined' && G.ch3Suspicion < 30) saveUnlock('sisters');
+
+  // Calico: any secret ending
+  if (ending.isSecret) {
+    saveUnlock('calico');
+    saveSecret(ending.secretKey);
+    if (getSecrets().length >= 4) saveUnlock('void_cat');
+  }
+}
+
+// ============================================================
+// SCREEN MANAGEMENT
+// ============================================================
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if (id==='title-screen') renderTitleCat();
+  if (id==='cat-select')   renderCatSelect();
+  if (id==='history-screen') renderHistory();
+}
+
+// ============================================================
+// TITLE
+// ============================================================
+function renderTitleCat() {
+  const el = document.getElementById('title-cat-display');
+  const unlocks = getUnlocks();
+  const available = CAT_ORDER.filter(id => CATS[id].unlocked || unlocks[id]);
+  const id = available[Math.floor(Math.random()*available.length)];
+  const cat = CATS[id];
+  const w = cat.isSisters ? 200 : cat.isVoid ? 130 : 110;
+  const h = cat.isVoid ? 148 : 130;
+  el.innerHTML = renderCatSVG(id, w, h, true);
+  document.getElementById('continue-btn').style.display = localStorage.getItem('yatc_state') ? 'flex' : 'none';
+}
+
+// ============================================================
+// CAT SELECT
+// ============================================================
+function renderCatSelect() {
+  const unlocks = getUnlocks();
+  const secrets  = getSecrets();
+  CAT_ORDER.forEach(id => { if(unlocks[id]) CATS[id].unlocked=true; });
+  if (secrets.length>=4) CATS.void_cat.unlocked=true;
+
+  const grid = document.getElementById('cats-grid');
+  grid.innerHTML = CAT_ORDER.map(id => {
+    const cat = CATS[id];
+    const unlocked = cat.unlocked;
+    const sel = selectedCat===id;
+    const cw = cat.isSisters ? 86 : 58;
+    const ch = cat.isVoid ? 68 : 62;
+    return `<div class="cat-tile ${unlocked?'':'locked'} ${sel?'selected':''}" onclick="${unlocked?`selectCat('${id}')`:``}">
+      ${sel?'<div class="active-icon">ON</div>':''}
+      ${!unlocked?'<div class="lock-icon">LOCK</div>':''}
+      <div style="width:${cw}px;height:${ch}px;display:flex;align-items:flex-end;justify-content:center;overflow:hidden">
+        ${renderCatSVG(id,cw,ch,false)}
+      </div>
+      <div class="cat-tile-name">${cat.name}</div>
+      <div class="cat-tile-hint">${unlocked?cat.tagline:cat.unlockHint}</div>
+    </div>`;
+  }).join('');
+}
+
+function selectCat(id) { selectedCat=id; renderCatSelect(); }
+
+// ============================================================
+// CHOICE POOL — pick 3 random choices from pool each run
+// stored in G.runChoicePool per [chapterIdx][decisionIdx]
+// ============================================================
+function buildChoicePool() {
+  G.runChoicePool = CHAPTERS.map(ch =>
+    ch.decisions.map(d => {
+      // Shuffle pool, always include at least one chaos and one calm/neutral if available
+      const chaos  = d.pool.filter(c=>c.tag==='chaos'||c.tag==='void');
+      const calm   = d.pool.filter(c=>c.tag==='calm');
+      const neutral= d.pool.filter(c=>c.tag==='neutral');
+      const rest   = d.pool.filter(c=>c.tag!=='chaos'&&c.tag!=='void'&&c.tag!=='calm'&&c.tag!=='neutral');
+
+      // guaranteed 1 chaos + 1 calm/neutral, then 1 random from remainder
+      const pick = [];
+      if (chaos.length)   pick.push(chaos[Math.floor(Math.random()*chaos.length)]);
+      const softPool = [...calm, ...neutral];
+      if (softPool.length) pick.push(softPool[Math.floor(Math.random()*softPool.length)]);
+      // fill to 3 from remaining pool
+      const usedKeys = new Set(pick.map(c=>c.key));
+      const remaining = d.pool.filter(c=>!usedKeys.has(c.key));
+      shuffle(remaining);
+      while(pick.length<3 && remaining.length) pick.push(remaining.pop());
+      shuffle(pick);
+      return pick;
+    })
+  );
+}
+
+function shuffle(arr) {
+  for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}
+  return arr;
+}
+
+// ============================================================
+// GAME START
+// ============================================================
+function startGame() {
+  G = {
+    catId: selectedCat,
+    chaos: 0,
+    suspicion: 0,
+    chapterIndex: 0,
+    decisionIndex: 0,
+    choiceHistory: [],
+    runChoicePool: [],
+    ch3Suspicion: undefined
+  };
+  buildChoicePool();
+  localStorage.removeItem('yatc_state');
+  showScreen('game-screen');
+  renderDecision();
+}
+
+function continueGame() {
+  if(loadGame()){ showScreen('game-screen'); renderDecision(); }
+}
+
+function startNewRun() { showScreen('cat-select'); }
+
+// ============================================================
+// RENDER DECISION
+// ============================================================
+function renderDecision() {
+  const chapter  = CHAPTERS[G.chapterIndex];
+  const decision = chapter.decisions[G.decisionIndex];
+  const choices  = G.runChoicePool[G.chapterIndex]?.[G.decisionIndex] || decision.pool.slice(0,3);
+
+  // header
+  document.getElementById('chapter-name').textContent = chapter.name;
+  document.getElementById('chapter-progress').textContent = `DECISION ${G.decisionIndex+1} OF ${chapter.decisions.length}`;
+
+  // meters
+  const cv = Math.min(100, G.chaos);
+  const sv = Math.min(100, G.suspicion);
+  document.getElementById('chaos-bar').style.width = cv+'%';
+  document.getElementById('chaos-val').textContent  = cv+'%';
+  document.getElementById('susp-bar').style.width  = sv+'%';
+  document.getElementById('susp-val').textContent   = sv+'%';
+  document.getElementById('chaos-bar').style.animation = cv>=60 ? 'pulse-chaos 1s infinite' : '';
+
+  // badges
+  document.getElementById('time-badge').textContent    = chapter.times[G.decisionIndex]||'';
+  document.getElementById('chapter-badge').textContent = chapter.badge;
+
+  // scene
+  const bg = SCENES[decision.sceneKey] || SCENES.kitchen_counter;
+  document.getElementById('scene-svg').innerHTML = bg + renderSceneCat();
+
+  // narration
+  let narration = decision.narration;
+  if (G.catId==='sisters' && Math.random()>0.55) {
+    const adds = ['The other one disagrees.','Neither of us planned this.','We have discussed this.','The other one is watching.','One of us is lying.'];
+    narration += ` <span class="hl">${adds[Math.floor(Math.random()*adds.length)]}</span>`;
+  }
+  document.getElementById('narration-text').innerHTML = narration + '<span class="cursor"></span>';
+
+  // choices
+  document.getElementById('choices').innerHTML = choices.map((c,i)=>{
+    let tag='';
+    if      (c.tag==='chaos')   tag='<span class="choice-tag tag-chaos">+CHAOS</span>';
+    else if (c.tag==='void')    tag='<span class="choice-tag tag-void">???</span>';
+    else if (c.tag==='calm')    tag='<span class="choice-tag tag-calm">GOOD CAT</span>';
+    else                        tag='<span class="choice-tag tag-neutral">NEUTRAL</span>';
+    const cls = c.tag==='chaos'?'chaos-choice':c.tag==='void'?'void-choice':'';
+    return `<button class="choice-btn ${cls}" onclick="makeChoice(${i})">
+      <span class="choice-arrow">▶</span>
+      <span class="choice-text">${c.text}</span>
+      ${tag}
+    </button>`;
+  }).join('');
+
+  // progress dots
+  document.getElementById('progress-dots').innerHTML = Array.from({length:chapter.decisions.length},(_,i)=>{
+    let cl='pdot'; if(i<G.decisionIndex)cl+=' done'; else if(i===G.decisionIndex)cl+=' cur';
+    return `<div class="${cl}"></div>`;
+  }).join('');
+
+  document.getElementById('footer-left').textContent = `CHAPTER ${G.chapterIndex+1} OF 4`;
+  saveGame();
+}
+
+function renderSceneCat() {
+  const cat = CATS[G.catId];
+  const w = cat.isSisters ? 200 : cat.isVoid ? 130 : 110;
+  const h = cat.isVoid ? 148 : 120;
+  const x = 340 - w/2;
+  return `<g transform="translate(${x}, 8)">${renderCatSVG(G.catId, w, h, true)}</g>`;
+}
+
+// ============================================================
+// MAKE CHOICE
+// ============================================================
+function makeChoice(index) {
+  const chapter  = CHAPTERS[G.chapterIndex];
+  const decision = chapter.decisions[G.decisionIndex];
+  const choices  = G.runChoicePool[G.chapterIndex]?.[G.decisionIndex] || decision.pool.slice(0,3);
+  const choice   = choices[index];
+
+  applyChoice(choice);  // enforces tag contract before applying
+  G.choiceHistory.push(choice.key);
+
+  // screen shake on high chaos
+  if (G.chaos >= 75) {
+    const gw = document.querySelector('.game-wrap');
+    gw.style.animation = 'screen-shake 0.3s ease';
+    setTimeout(()=>{ gw.style.animation=''; }, 320);
+  }
+
+  G.decisionIndex++;
+
+  // end of chapter 3 — snapshot suspicion for sisters unlock
+  if (G.chapterIndex === 2 && G.decisionIndex >= chapter.decisions.length) {
+    G.ch3Suspicion = G.suspicion;
+    console.log('CH3 suspicion snapshot:', G.ch3Suspicion);
+  }
+
+  if (G.decisionIndex >= chapter.decisions.length) {
+    G.chapterIndex++;
+    G.decisionIndex = 0;
+    if (G.chapterIndex >= CHAPTERS.length) { endGame(); return; }
+  }
+
+  renderDecision();
+}
+
+// ============================================================
+// END GAME
+// ============================================================
+function endGame() {
+  const ending = getEnding(G.chaos, G.suspicion, G.choiceHistory);
+  processUnlocks(ending);
+  saveHistory(ending);
+  localStorage.removeItem('yatc_state');
+
+  document.getElementById('ending-title').textContent   = ending.title;
+  document.getElementById('ending-title').style.color   = ending.color;
+  document.getElementById('ending-chapter').textContent = `CHAOS: ${G.chaos}%  /  SUSPICION: ${G.suspicion}%`;
+
+  const cat = CATS[G.catId];
+  const ew  = cat.isSisters ? 200 : cat.isVoid ? 130 : 110;
+  const eh  = cat.isVoid ? 148 : 130;
+  document.getElementById('ending-cat-display').innerHTML = renderCatSVG(G.catId, ew, eh, true);
+
+  document.getElementById('end-chaos-bar').style.width  = G.chaos+'%';
+  document.getElementById('end-chaos-val').textContent   = G.chaos+'%';
+  document.getElementById('end-susp-bar').style.width   = G.suspicion+'%';
+  document.getElementById('end-susp-val').textContent    = G.suspicion+'%';
+
+  document.getElementById('ending-text').textContent = ending.text;
+
+  const sec = document.getElementById('ending-secret');
+  if (ending.isSecret) {
+    sec.style.display='block';
+    sec.textContent = '★ '+ending.secretLabel+' ★';
+  } else {
+    sec.style.display='none';
+  }
+
+  showScreen('ending-screen');
+}
+
+// ============================================================
+// HISTORY
+// ============================================================
+function renderHistory() {
+  const list = document.getElementById('history-list');
+  try {
+    const h = JSON.parse(localStorage.getItem('yatc_history')||'[]');
+    if (!h.length) { list.innerHTML='<div style="font-size:18px;color:var(--text-dim);padding:20px;text-align:center;">No runs yet. The cat has not yet decided to act.</div>'; return; }
+    list.innerHTML = h.map(r=>`<div class="history-item">
+      <div>
+        <div class="history-ending" style="${r.isSecret?'color:#cc44ff':''}">${r.ending}</div>
+        <div class="history-cat">${r.cat}</div>
+      </div>
+      <div class="history-date">CHAOS ${r.chaos}%<br/>SUSP ${r.suspicion}%<br/>${r.date}</div>
+    </div>`).join('');
+  } catch(e) { list.innerHTML='<div style="color:var(--text-dim);padding:20px;">No history found.</div>'; }
+}
+
+// ============================================================
+// INIT
+// ============================================================
+window.onload = () => {
+  const unlocks = getUnlocks();
+  CAT_ORDER.forEach(id=>{ if(unlocks[id]) CATS[id].unlocked=true; });
+  if (getSecrets().length>=4) CATS.void_cat.unlocked=true;
+  renderTitleCat();
+};
+</script>
+</body>
+</html>
